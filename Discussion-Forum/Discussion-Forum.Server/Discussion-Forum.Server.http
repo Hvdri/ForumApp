@@ -1,0 +1,6 @@
+@Discussion_Forum.Server_HostAddress = http://localhost:5015
+
+GET {{Discussion_Forum.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
