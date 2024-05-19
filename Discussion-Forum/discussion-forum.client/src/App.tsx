@@ -9,6 +9,7 @@ import Register from './Pages/Register.tsx';
 
 function App() {
     return (
+
         <BrowserRouter>
             <Routes>
                 <Route path="/login" element={<Login />} />

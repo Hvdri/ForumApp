@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discussion-Forum.Server", "Discussion-Forum.Server\Discussion-Forum.Server.csproj", "{E0CF0411-A7CE-4CDE-B22F-A54E27327304}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discussion-Forum.Server", "Discussion-Forum.Server\Discussion-Forum.Server.csproj", "{E0CF0411-A7CE-4CDE-B22F-A54E27327304}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "discussion-forum.client", "discussion-forum.client\discussion-forum.client.esproj", "{93FCBE48-EE92-46FE-8397-ADCBC759F31A}"
 EndProject
