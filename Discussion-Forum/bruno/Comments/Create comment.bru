@@ -1,0 +1,17 @@
+meta {
+  name: Create comment
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/post/392a4a4b-4bc0-4f9b-9305-87b07b1786e5/comment
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "content": "Test comment"
+  }
+}

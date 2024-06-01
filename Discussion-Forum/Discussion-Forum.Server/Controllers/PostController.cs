@@ -1,7 +1,6 @@
 ﻿using Discussion_Forum.Server.Database;
 using Discussion_Forum.Server.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -40,6 +39,12 @@ namespace Discussion_Forum.Server.Controllers
             return Ok(post);
         }
 
+        [HttpGet("{id}/comments")]
+        public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsByPost(Guid id)
+        {
+            return await _context.Comments.Where(c => c.PostId == id).ToListAsync();
+        }
+
         [HttpPost, Authorize(Roles = "User,Admin,Moderator")]
         public async Task<ActionResult<Post>> CreatePost(CreatePostRequest postRequest)
         {
@@ -75,6 +80,38 @@ namespace Discussion_Forum.Server.Controllers
             return CreatedAtAction(nameof(GetPost), new { id = post.Id }, post);
         }
 
+        [HttpPost("{id}/comment"), Authorize(Roles = "User,Admin,Moderator")]
+        public async Task<ActionResult<Comment>> CreateComment(Guid id, CreateCommentRequest commentRequest)
+        {
+            var post = await _context.Posts.FindAsync(id);
+            if (post == null)
+            {
+                return BadRequest("Post does not exist.");
+            }
+
+            var authorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var author = await _context.Users.FindAsync(authorId);
+            if (author == null)
+            {
+                return NotFound("Author not found.");
+            }
+
+            var comment = new Comment
+            {
+                Id = Guid.NewGuid(),
+                Content = commentRequest.Content,
+                PostId = id,
+                Post = post,
+                Author = author,
+                AuthorId = authorId
+            };
+
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+
+            return Ok(comment); ;
+        }
+
         [HttpPut("{id}"), Authorize(Roles = "User,Admin,Moderator")]
         public async Task<IActionResult> UpdatePost(Guid id, Post updatedPost)
         {
@@ -92,7 +129,7 @@ namespace Discussion_Forum.Server.Controllers
             }
 
             var isSuperUser = CheckSuperUser();
-            var isAuthor = existingPost.AuthorId != loggedInUserId;
+            var isAuthor = existingPost.AuthorId == loggedInUserId;
 
             if (!isSuperUser && !isAuthor)
             {
@@ -132,7 +169,7 @@ namespace Discussion_Forum.Server.Controllers
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var isSuperUser = CheckSuperUser();
-            var isAuthor = post.AuthorId != loggedInUserId;
+            var isAuthor = post.AuthorId == loggedInUserId;
 
             if (!isSuperUser && !isAuthor)
             {
@@ -160,6 +197,10 @@ namespace Discussion_Forum.Server.Controllers
             public string Title { get; set; }
             public string Content { get; set; }
             public Guid TopicId { get; set; }
+        }
+        public class CreateCommentRequest
+        {
+            public string Content { get; set; }
         }
     }
 }

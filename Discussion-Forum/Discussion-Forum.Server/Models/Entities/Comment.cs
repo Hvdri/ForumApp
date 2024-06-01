@@ -13,7 +13,7 @@ namespace Discussion_Forum.Server.Models.Entities
         public string AuthorId { get; set; }
         public virtual User Author { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -6,6 +6,10 @@ namespace Discussion_Forum.Server.Database
 {
     public class ForumDbContext : IdentityDbContext<User>
     {
+        public DbSet<Topic> Topics { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+
         public ForumDbContext() : base()
         {
         }
@@ -21,7 +25,6 @@ namespace Discussion_Forum.Server.Database
                 .HasOne(p => p.Author)
                 .WithMany(u => u.Posts)
                 .HasForeignKey(p => p.AuthorId)
-                .IsRequired(false)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Post>()
@@ -40,11 +43,7 @@ namespace Discussion_Forum.Server.Database
                 .HasOne(c => c.Post)
                 .WithMany(p => p.Comments)
                 .HasForeignKey(c => c.PostId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
         }
-
-        public DbSet<Topic> Topics { get; set;}
-        public DbSet<Post> Posts { get; set;}
-        public DbSet<Comment> Comments { get; set;}
     }
 }
