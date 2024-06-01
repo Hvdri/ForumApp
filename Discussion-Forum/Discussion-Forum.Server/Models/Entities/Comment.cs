@@ -12,8 +12,5 @@
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-
-        public string UpdatedById { get; set; }
-        public User UpdatedBy { get; set; }
     }
 }
