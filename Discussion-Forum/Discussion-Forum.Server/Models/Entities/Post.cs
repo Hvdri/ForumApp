@@ -7,12 +7,12 @@
         public string Content { get; set; }
 
         public string AuthorId { get; set; }
-        public User Author { get; set; }
+        public virtual User Author { get; set; }
         public Guid TopicId { get; set; }
-        public Topic Topic { get; set; }
-        public ICollection<Comment> Comments { get; set; }
+        public virtual Topic Topic { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }
 }

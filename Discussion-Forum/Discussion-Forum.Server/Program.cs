@@ -20,7 +20,8 @@ namespace Discussion_Forum.Server
             builder.Services.AddControllers();
 
             builder.Services.AddDbContext<ForumDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("Forum"))
+                options.UseLazyLoadingProxies(true)
+                    .UseSqlServer(builder.Configuration.GetConnectionString("Forum"))
             );
 
             builder.Services.AddIdentityApiEndpoints<User>()

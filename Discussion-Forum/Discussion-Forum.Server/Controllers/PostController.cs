@@ -1,6 +1,7 @@
 ﻿using Discussion_Forum.Server.Database;
 using Discussion_Forum.Server.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -21,7 +22,15 @@ namespace Discussion_Forum.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Post>>> GetPosts()
         {
-            return await _context.Posts.ToListAsync();
+            var posts = await _context.Posts.ToListAsync();
+            Console.Write(posts);
+            return posts;
+        }
+
+        [HttpGet("{id}/posts")]
+        public async Task<ActionResult<IEnumerable<Post>>> GetPostsByTopicId(Guid id)
+        {
+            return await _context.Posts.Where(p => p.TopicId == id).ToListAsync();
         }
 
         [HttpGet("{id}")]
@@ -34,13 +43,37 @@ namespace Discussion_Forum.Server.Controllers
                 return NotFound();
             }
 
-            return post;
+            return Ok(post);
         }
 
         [HttpPost, Authorize(Roles = "User,Admin,Moderator")]
-        public async Task<ActionResult<Post>> CreatePost(Post post)
+        public async Task<ActionResult<Post>> CreatePost(CreatePostRequest postRequest)
         {
-            post.Id = Guid.NewGuid();
+            var author = await _context.Users.FindAsync(postRequest.AuthorId);
+            if (author == null)
+            {
+                return NotFound("Author not found.");
+            }
+
+            var topic = await _context.Topics.FindAsync(postRequest.TopicId);
+            if (topic == null)
+            {
+                return NotFound("Topic not found.");
+            }
+
+            var post = new Post
+            {
+                Id = Guid.NewGuid(),
+                Title = postRequest.Title,
+                Content = postRequest.Content,
+                AuthorId = postRequest.AuthorId,
+                Author = author,
+                TopicId = postRequest.TopicId,
+                Topic = topic,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
 
@@ -125,6 +158,15 @@ namespace Discussion_Forum.Server.Controllers
         private bool CheckSuperUser()
         {
             return User.IsInRole("Admin") || User.IsInRole("Moderator");
+        }
+
+        public class CreatePostRequest
+        {
+            public string Title { get; set; }
+            public string Content { get; set; }
+
+            public string AuthorId { get; set; }
+            public Guid TopicId { get; set; }
         }
     }
 }

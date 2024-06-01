@@ -21,6 +21,7 @@ namespace Discussion_Forum.Server.Database
                 .HasOne(p => p.Author)
                 .WithMany(u => u.Posts)
                 .HasForeignKey(p => p.AuthorId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Post>()

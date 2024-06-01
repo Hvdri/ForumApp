@@ -51,7 +51,7 @@ namespace Discussion_Forum.Server.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("Discussion_Forum.Server.Models.Entities.Post", b =>
@@ -87,7 +87,7 @@ namespace Discussion_Forum.Server.Migrations
 
                     b.HasIndex("TopicId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("Discussion_Forum.Server.Models.Entities.Topic", b =>
@@ -106,7 +106,7 @@ namespace Discussion_Forum.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Topics");
+                    b.ToTable("Topics", (string)null);
                 });
 
             modelBuilder.Entity("Discussion_Forum.Server.Models.Entities.User", b =>

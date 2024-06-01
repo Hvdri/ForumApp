@@ -1,4 +1,6 @@
-﻿namespace Discussion_Forum.Server.Models.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace Discussion_Forum.Server.Models.Entities
 {
     public class Comment
     {
@@ -6,9 +8,10 @@
         public string Content { get; set; }
 
         public Guid PostId { get; set; }
-        public Post Post { get; set; }
+        [JsonIgnore]
+        public virtual Post Post { get; set; }
         public string AuthorId { get; set; }
-        public User Author { get; set; }
+        public virtual User Author { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
