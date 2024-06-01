@@ -28,6 +28,15 @@ namespace Discussion_Forum.Server
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ForumDbContext>();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder => builder
+                        .WithOrigins("https://localhost:5173") // Update this to your React app's URL
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -45,7 +54,7 @@ namespace Discussion_Forum.Server
             builder.Services.AddAuthorization();
 
             var app = builder.Build();
-
+            app.UseCors("AllowSpecificOrigin");
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
@@ -57,8 +66,6 @@ namespace Discussion_Forum.Server
             }
 
             app.MapIdentityApi<User>();
-
-            app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();

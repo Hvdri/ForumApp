@@ -1,124 +1,54 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// pages/Register.tsx
+import React, { useState } from 'react';
+import axios from '../api/axiosConfig';
+import { useNavigate } from 'react-router-dom';
 
-
-function Register() {
-    // state variables for email and passwords
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+const Register = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    // state variable for error messages
-    const [error, setError] = useState("");
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
 
-    const handleLoginClick = () => {
-        navigate("/login");
-    }
-
-
-    // handle change events for input fields
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (name === "email") setEmail(value);
-        if (name === "password") setPassword(value);
-        if (name === "confirmPassword") setConfirmPassword(value);
-    };
-
-    // handle submit event for the form
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // validate email and passwords
-        if (!email || !password || !confirmPassword) {
-            setError("Please fill in all fields.");
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            setError("Please enter a valid email address.");
-        } else if (password !== confirmPassword) {
-            setError("Passwords do not match.");
-        } else {
-            // clear error message
-            setError("");
-            // post data to the /register api
-            fetch("/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                }),
-            })
-                //.then((response) => response.json())
-                .then((data) => {
-                    // handle success or error from the server
-                    console.log(data);
-                    if (data.ok)
-                        setError("Successful register.");
-                    else
-                        setError("Error registering.");
-
-                })
-                .catch((error) => {
-                    // handle network error
-                    console.error(error);
-                    setError("Error registering.");
-                });
+        try {
+            await axios.post('register', { email, password });
+            navigate('/login');
+        } catch (err) {
+            setError('Registration failed');
         }
     };
 
     return (
-        <div className="container">
-        <div className="box">
-            <h3>Register</h3>
-
+        <div>
+            <h2>Register</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="email">Email:</label>
-                </div><div>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={email}
-                        onChange={handleChange}
-                    />
+                    <label>Email</label>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                 </div>
                 <div>
-                    <label htmlFor="password">Password:</label></div><div>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={password}
-                        onChange={handleChange}
-                    />
+                    <label>Password</label>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
                 <div>
-                    <label htmlFor="confirmPassword">Confirm Password:</label></div><div>
-                    <input
-                        type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        value={confirmPassword}
-                        onChange={handleChange}
-                    />
-                    </div>
-                    <div className="button-group-container">
-                        <div className="button-container">
-                    <button type="submit">Register</button>
-
+                    <label>Confirm Password</label>
+                    <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                 </div>
-                        <div className="button-container">
-                    <button onClick={handleLoginClick}>Go to Login</button>
-                        </div>
-                    </div>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                <button type="submit">Register</button>
             </form>
-
-            {error && <p className="error">{error}</p>}
+            <div>
+                <p>Already have an account? <a href="/login">Login</a></p>
             </div>
-        </div>  
+        </div>
     );
-}
+};
 
 export default Register;
