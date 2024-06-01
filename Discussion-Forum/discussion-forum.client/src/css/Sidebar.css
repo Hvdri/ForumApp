@@ -1,0 +1,27 @@
+ul, li {
+    list-style-type: none;
+}
+
+
+
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+    padding: 0 2rem 0 2rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.topic-container {
+}
+
+.topic {
+    width: 200px;
+    padding: 0.5rem;
+    border-radius: .5rem;
+}
+
+.topic:hover {
+    background-color: #333;
+    color: #fff;
+}

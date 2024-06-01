@@ -1,4 +1,4 @@
-.container {
+.auth-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -9,14 +9,15 @@
     box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
     padding: 0 4rem 0 4rem;
     height: 500px;
+    
     position: relative;
 }
 
-.title-container {
-}
-
-.form-container {
-
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 .fields-form {
@@ -30,8 +31,4 @@
     bottom: 0;
 }
 
-label {
-    align-self: flex-start;
-    margin-left: -0.5rem;
-}
 
