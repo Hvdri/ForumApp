@@ -52,7 +52,7 @@ namespace Discussion_Forum.Server.Controllers
         {
             if (id != updatedTopic.Id)
             {
-                return BadRequest();
+                return BadRequest("Topic id not matching.");
             }
 
             _context.Entry(updatedTopic).State = EntityState.Modified;

@@ -1,9 +1,9 @@
 ﻿using Discussion_Forum.Server.Database;
 using Discussion_Forum.Server.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Discussion_Forum.Server.Controllers
 {
@@ -48,11 +48,27 @@ namespace Discussion_Forum.Server.Controllers
         }
 
         [HttpPut("{id}"), Authorize(Roles = "User,Admin,Moderator")]
-        public async Task<IActionResult> UpdatePost(Guid id, Topic updatedPost)
+        public async Task<IActionResult> UpdatePost(Guid id, Post updatedPost)
         {
             if (id != updatedPost.Id)
             {
                 return BadRequest();
+            }
+
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var existingPost = await _context.Posts.FindAsync(id);
+            if (existingPost == null)
+            {
+                return NotFound();
+            }
+
+            var isSuperUser = CheckSuperUser();
+            var isAuthor = existingPost.AuthorId != loggedInUserId;
+
+            if (!isSuperUser && !isAuthor)
+            {
+                return Forbid();
             }
 
             _context.Entry(updatedPost).State = EntityState.Modified;
@@ -76,9 +92,39 @@ namespace Discussion_Forum.Server.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{id}"), Authorize(Roles = "User,Moderator,Admin")]
+        public async Task<IActionResult> DeletePost(Guid id)
+        {
+            var post = await _context.Posts.FindAsync(id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var isSuperUser = CheckSuperUser();
+            var isAuthor = post.AuthorId != loggedInUserId;
+
+            if (!isSuperUser && !isAuthor)
+            {
+                return Forbid();
+            }
+
+            _context.Posts.Remove(post);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         private bool PostExists(Guid id)
         {
             return _context.Posts.Any(e => e.Id == id);
+        }
+
+        private bool CheckSuperUser()
+        {
+            return User.IsInRole("Admin") || User.IsInRole("Moderator");
         }
     }
 }
