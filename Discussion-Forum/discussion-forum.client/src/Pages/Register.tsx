@@ -16,6 +16,22 @@ const Register = () => {
             setError('Passwords do not match');
             return;
         }
+        if (password.length < 8) {
+            setError('Password must be at least 8 characters long');
+            return;
+        }
+        if (!/\d/.test(password)) {
+            setError('Password must contain at least one digit');
+            return;
+        }
+        if (!/[A-Z]/.test(password)) {
+            setError('Password must contain at least one uppercase letter');
+            return;
+        }
+        if (!/\W/.test(password)) {
+            setError('Password must contain at least one non-alphanumeric character');
+            return;
+        }
 
         try {
             await axios.post('register', { email, password });
@@ -26,25 +42,31 @@ const Register = () => {
     };
 
     return (
-        <div>
-            <h2>Register</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Email</label>
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                </div>
-                <div>
-                    <label>Password</label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                </div>
-                <div>
-                    <label>Confirm Password</label>
-                    <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-                </div>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                <button type="submit">Register</button>
-            </form>
-            <div>
+        <div className='container'>
+            <div className='title-container'>
+                <h2>Register</h2>
+            </div>
+            <div className='form-container'>
+                <form onSubmit={handleSubmit}>
+                    <div className='fields-form'>
+                        <label>Email</label>
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                    </div>
+                    <div className='fields-form'>
+                        <label>Password</label>
+                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    </div>
+                    <div className='fields-form'>
+                        <label>Confirm Password</label>
+                        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                    </div>
+                    <div className='fields-form'>
+                        {error && <p style={{ color: 'red' }}>{error}</p>}
+                        <button type="submit">Register</button>
+                    </div>
+                </form>
+            </div>
+            <div className='footer-container'>
                 <p>Already have an account? <a href="/login">Login</a></p>
             </div>
         </div>

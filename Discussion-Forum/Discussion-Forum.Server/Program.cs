@@ -65,6 +65,8 @@ namespace Discussion_Forum.Server
                 app.UseSwaggerUI();
             }
 
+
+
             app.MapIdentityApi<User>();
 
             app.UseAuthentication();
