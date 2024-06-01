@@ -27,12 +27,6 @@ namespace Discussion_Forum.Server.Controllers
             return posts;
         }
 
-        [HttpGet("{id}/posts")]
-        public async Task<ActionResult<IEnumerable<Post>>> GetPostsByTopicId(Guid id)
-        {
-            return await _context.Posts.Where(p => p.TopicId == id).ToListAsync();
-        }
-
         [HttpGet("{id}")]
         public async Task<ActionResult<Post>> GetPost(Guid id)
         {
@@ -49,7 +43,8 @@ namespace Discussion_Forum.Server.Controllers
         [HttpPost, Authorize(Roles = "User,Admin,Moderator")]
         public async Task<ActionResult<Post>> CreatePost(CreatePostRequest postRequest)
         {
-            var author = await _context.Users.FindAsync(postRequest.AuthorId);
+            var authorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var author = await _context.Users.FindAsync(authorId);
             if (author == null)
             {
                 return NotFound("Author not found.");
@@ -66,7 +61,7 @@ namespace Discussion_Forum.Server.Controllers
                 Id = Guid.NewGuid(),
                 Title = postRequest.Title,
                 Content = postRequest.Content,
-                AuthorId = postRequest.AuthorId,
+                AuthorId = author.Id,
                 Author = author,
                 TopicId = postRequest.TopicId,
                 Topic = topic,
@@ -164,8 +159,6 @@ namespace Discussion_Forum.Server.Controllers
         {
             public string Title { get; set; }
             public string Content { get; set; }
-
-            public string AuthorId { get; set; }
             public Guid TopicId { get; set; }
         }
     }

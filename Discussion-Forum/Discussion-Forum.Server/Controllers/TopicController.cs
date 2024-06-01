@@ -37,6 +37,12 @@ namespace Discussion_Forum.Server.Controllers
             return topic;
         }
 
+        [HttpGet("{id}/posts")]
+        public async Task<ActionResult<IEnumerable<Post>>> GetPostsByTopicId(Guid id)
+        {
+            return await _context.Posts.Where(p => p.TopicId == id).ToListAsync();
+        }
+
         [HttpPost, Authorize(Roles = "Admin")]
         public async Task<ActionResult<Topic>> CreateTopic(Topic topic)
         {
