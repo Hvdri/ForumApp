@@ -1,0 +1,42 @@
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: .5rem 1rem 0 1rem;
+    width: 100%;
+}
+
+.topic-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    background: rgba(37, 37, 37, 0.3);
+    backdrop-filter: blur(5px);
+    border-radius: .25rem;
+    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.2);
+    border-radius: .5rem;
+}
+
+.posts-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.post-body {
+    border-radius: 1rem;
+    padding: 1rem;
+    width: 100%;
+}
+
+.post-body:hover {
+    background-color: #333;
+    color: #fff;
+    transition: all 0.1s ease;
+}
+
+.line {
+    width: 100%;
+    border-bottom: 1px solid #333;
+}

@@ -3,12 +3,17 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import TopicPage from './pages/Posts';
+import Posts from './pages/Posts';
 import CreateTopic from './pages/CreateTopic';
+import CreatePost from './pages/CreatePost';
+import PostDetail from './pages/PostDetail';
 import PrivateRoute from './components/PrivateRoute';
 import Sidebar from './components/Sidebar';
 import { useEffect, useState } from 'react';
 import axios from './api/axiosConfig';
+
+
+import Navbar from './components/Navbar';
 
 function App() {
     const [topics, setTopics] = useState([]);
@@ -18,7 +23,6 @@ function App() {
         try {
             const response = await axios.get('/user/current');
             setUser(response.data);
-            console.log("user" + response.data);
         } catch (error) {
             console.error('Error fetching user', error);
         }
@@ -40,6 +44,7 @@ function App() {
 
     return (
         <BrowserRouter>
+            <Navbar />
             <div className="app-container">
                 <aside className="sidebar">
                     <Sidebar
@@ -51,7 +56,9 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/create-topic" element={<PrivateRoute element={CreateTopic} />} />
-                        <Route path="/topic/:topicId" element={<PrivateRoute element={TopicPage} />} />
+                        <Route path="/topic/:topicId/create-post" element={<PrivateRoute element={CreatePost} />} />
+                        <Route path="/post/:postId" element={<PrivateRoute element={PostDetail} />} />
+                        <Route path="/topic/:topicId" element={<PrivateRoute element={Posts} />} />
                         <Route path="/" element={<PrivateRoute element={Home} />} />
                     </Routes>
                 </main>

@@ -1,0 +1,27 @@
+.navbar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    background-color: #111;
+    color: white;
+    z-index: 1000;
+}
+
+.navbar div {
+    margin: 0 1rem 0 1rem;
+}
+
+.navbar-logo .icon {
+    height: 25px;
+    cursor: pointer;
+}
+
+.navbar-user .icon {
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+}

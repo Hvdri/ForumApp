@@ -3,7 +3,7 @@
 }
 
 body {
-    background-color: #121212;
+    background-color: #141414;
     color: #e0e0e0;
     font-family: Arial, sans-serif;
     height: 100vh;
@@ -74,14 +74,14 @@ button:focus {
     width: 250px;
     position: fixed;
     z-index: 1;
-    top: 0;
-    left: 0;
     background-color: #111;
     overflow-x: hidden;
-    padding-top: 20px;
+    padding-top: 50px; /* 50px for navbar */
 }
 
 .main-content {
     display: flex;
+    justify-content: center;
     margin-left: 250px;
+    padding-top: 50px; /* 50px for navbar */
 }
