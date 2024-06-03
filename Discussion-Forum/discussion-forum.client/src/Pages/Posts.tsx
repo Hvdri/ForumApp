@@ -50,12 +50,12 @@ const Posts = () => {
 
     return (
         <div className='main-container'>
-            <div className='topic-container'>
-                {topic && <h2>{topic.name}</h2>}
-                <button onClick={() => navigate(`/topic/${topicId}/create-post`)}><FontAwesomeIcon icon={faPlus}/> Create a Post</button>
+            <div className='topic-banner'>
+                {topic && <h2 className='banner-item'>{topic.name}</h2>}
+                <button className='banner-item' onClick={() => navigate(`/topic/${topicId}/create-post`)}><FontAwesomeIcon icon={faPlus}/> Create a Post</button>
             </div>
             <div className='posts-container'>
-                <ul>
+                <div>
                     {posts.length > 0 ? (
                         posts.map((post: any) => (
                             <>
@@ -71,7 +71,7 @@ const Posts = () => {
                     ) : (
                         <p>No posts in current topic</p>
                     )}
-                </ul>
+                </div>
             </div>
         </div>
     );

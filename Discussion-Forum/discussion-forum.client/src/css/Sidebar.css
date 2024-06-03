@@ -17,9 +17,27 @@ ul, li {
     width: 200px;
     padding: 0.5rem;
     border-radius: .5rem;
+    margin-bottom: .25rem;
+    cursor: context-menu;
 }
 
 .topic:hover {
     background-color: #333;
     color: #fff;
+}
+
+.topic.selected {
+    background-color: #333;
+    color: #fff;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    height: 20px;
+}
+
+.icon {
+    font-size: 20px;
+    padding-right: 1rem;
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../api/axiosConfig';
 
@@ -10,6 +10,22 @@ const CreatePost = () => {
     const { topicId } = useParams<{ topicId: string }>();
     const navigate = useNavigate();
     const [newPost, setNewPost] = useState({ title: '', content: '' });
+    const [topicName, setTopicName] = useState('');
+
+    useEffect(() => {
+        const fetchTopicDetails = async () => {
+            try {
+                const response = await axios.get(`/topic/${topicId}`);
+                setTopicName(response.data.name);
+            } catch (error) {
+                console.error('Error fetching topic details', error);
+            }
+        };
+
+        if (topicId) {
+            fetchTopicDetails();
+        }
+    }, [topicId]);
 
     const handleCreatePost = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,8 +43,8 @@ const CreatePost = () => {
 
     return (
         <div className="create-container">
-            <div className='create-content'>
-                <h2>Create a New Post</h2>
+            <div className="create-content">
+                <h2>Create a New Post in "{topicName}"</h2>
                 <form onSubmit={handleCreatePost}>
                     <label>Post Title</label>
                     <input
@@ -45,7 +61,7 @@ const CreatePost = () => {
                         placeholder="Post content"
                         required
                     ></textarea>
-                    <div className='button-group'>
+                    <div className="button-group">
                         <button type="button" onClick={handleCancel}>Cancel</button>
                         <button type="submit">Create Post</button>
                     </div>
