@@ -26,6 +26,11 @@
     align-items: center;
 }
 
+label {
+    align-self: flex-start;
+    margin-left: -.5rem;
+}
+
 .footer-container {
     position: absolute;
     bottom: 0;

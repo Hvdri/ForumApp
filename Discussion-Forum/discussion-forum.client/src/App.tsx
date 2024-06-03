@@ -1,3 +1,4 @@
+// App.tsx
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
@@ -12,24 +13,23 @@ import Sidebar from './components/Sidebar';
 import { useEffect, useState } from 'react';
 import axios from './api/axiosConfig';
 
-
 import Navbar from './components/Navbar';
 
 function App() {
     const [topics, setTopics] = useState([]);
-    const [user, setUser] = useState(null);
+    // const [user, setUser] = useState(null);
 
-    const fetchUser = async () => {
-        try {
-            const response = await axios.get('/user/current');
-            setUser(response.data);
-        } catch (error) {
-            console.error('Error fetching user', error);
-        }
-    }
+    // const fetchUser = async () => {
+    //     try {
+    //         const response = await axios.get('/user/current');
+    //         setUser(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching user', error);
+    //     }
+    // }
 
     useEffect(() => {
-        fetchUser();
+        // fetchUser();
         fetchTopics();
     }, []);
 
@@ -47,9 +47,7 @@ function App() {
             <Navbar />
             <div className="app-container">
                 <aside className="sidebar">
-                    <Sidebar
-                        topics={topics}
-                    />
+                    <Sidebar topics={topics} />
                 </aside>
                 <main className="main-content">
                     <Routes>
@@ -57,9 +55,9 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/create-topic" element={<PrivateRoute element={CreateTopic} />} />
                         <Route path="/topic/:topicId/create-post" element={<PrivateRoute element={CreatePost} />} />
-                        <Route path="/post/:postId" element={<PrivateRoute element={PostDetail} />} />
-                        <Route path="/topic/:topicId" element={<PrivateRoute element={Posts} />} />
-                        <Route path="/" element={<PrivateRoute element={Home} />} />
+                        <Route path="/post/:postId" element={<PostDetail />} />
+                        <Route path="/topic/:topicId" element={<Posts />} />
+                        <Route path="/" element={<Home />} />
                     </Routes>
                 </main>
             </div>

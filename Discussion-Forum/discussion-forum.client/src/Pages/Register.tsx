@@ -1,7 +1,7 @@
+// Register.tsx
 import React, { useState } from 'react';
 import axios from '../api/axiosConfig';
 import { useNavigate } from 'react-router-dom';
-
 import '../css/Auth.css';
 
 const Register = () => {
@@ -35,7 +35,9 @@ const Register = () => {
         }
 
         try {
-            await axios.post('register', { email, password });
+            const response = await axios.post('register', { email, password });
+            localStorage.setItem('token', response.data.accessToken);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
             navigate('/login');
         } catch (err) {
             setError('Registration failed');
