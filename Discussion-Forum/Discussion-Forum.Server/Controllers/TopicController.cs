@@ -23,7 +23,7 @@ namespace Discussion_Forum.Server.Controllers
             return await _context.Topics.ToListAsync();
         }
 
-        [HttpGet("{id}"), Authorize(Roles = "Admin")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Topic>> GetTopic(Guid id)
         {
             var topic = await _context.Topics.FindAsync(id);
