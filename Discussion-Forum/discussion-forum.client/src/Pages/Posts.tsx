@@ -17,6 +17,7 @@ const Posts = () => {
         if (topicId) {
             fetchTopic(topicId);
             fetchPosts(topicId);
+            console.log('topicId', topicId)
         }
     }, [topicId]);
 
@@ -52,7 +53,7 @@ const Posts = () => {
         <div className='main-container'>
             <div className='topic-banner'>
                 {topic && <h2 className='banner-item'>{topic.name}</h2>}
-                <button className='banner-item' onClick={() => navigate(`/topic/${topicId}/create-post`)}><FontAwesomeIcon icon={faPlus}/> Create a Post</button>
+                <button className='banner-item' onClick={() => navigate(`/topic/${topicId}/create-post`)}><FontAwesomeIcon icon={faPlus} /> Create a Post</button>
             </div>
             <div className='posts-container'>
                 <div>

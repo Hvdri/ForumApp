@@ -23,7 +23,6 @@ const Sidebar = ({ topics }: { topics: any[] }) => {
         navigate('/create-topic');
     };
 
-    // Set the selected topic based on the current URL
     useEffect(() => {
         const pathParts = location.pathname.split('/');
         if (pathParts[1] === 'topic' && pathParts[2]) {

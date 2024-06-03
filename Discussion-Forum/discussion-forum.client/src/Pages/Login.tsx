@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from '../api/axiosConfig';
 import { useNavigate } from 'react-router-dom';
-
 import '../css/Auth.css';
 
 const Login = () => {
@@ -15,6 +14,7 @@ const Login = () => {
         try {
             const response = await axios.post('login', { email, password });
             localStorage.setItem('token', response.data.accessToken);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
             navigate('/');
         } catch (err) {
             setError('Invalid login credentials');
