@@ -11,10 +11,10 @@ const Sidebar = ({ topics }: { topics: any[] }) => {
     const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
     const [isCreatingTopic, setIsCreatingTopic] = useState(false);
 
-    const handleTopicClick = (topicId: string) => {
-        setSelectedTopicId(topicId);
+    const handleTopicClick = (topic: any) => {
+        setSelectedTopicId(topic.id);
         setIsCreatingTopic(false);
-        navigate(`/topic/${topicId}`);
+        navigate(`/topic/${topic.id}`, { state: { topic } });
     };
     
     const handleCreateTopicClick = () => {
@@ -48,7 +48,7 @@ const Sidebar = ({ topics }: { topics: any[] }) => {
                 <li key={topic.id}>
                     <div
                         className={`topic ${selectedTopicId === topic.id ? 'selected' : ''} sidebar-item`}                        
-                        onClick={() => handleTopicClick(topic.id)}
+                        onClick={() => handleTopicClick(topic)}
                     >
                         <FontAwesomeIcon className='icon' icon={faMessage} />
                         <p>{topic.name}</p>

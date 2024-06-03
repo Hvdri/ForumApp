@@ -3,7 +3,13 @@ import axios from '../api/axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import '../css/Auth.css';
 
-const Login = () => {
+import { User } from '../App.tsx';
+
+interface LoginProps {
+    setUser: (user: User | null) => void;
+}
+
+const Login: React.FC<LoginProps> = ({ setUser }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -15,6 +21,7 @@ const Login = () => {
             const response = await axios.post('login', { email, password });
             localStorage.setItem('token', response.data.accessToken);
             localStorage.setItem('refreshToken', response.data.refreshToken);
+            setUser(response.data.user);
             navigate('/');
         } catch (err) {
             setError('Invalid login credentials');

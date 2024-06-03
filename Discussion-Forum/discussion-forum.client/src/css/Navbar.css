@@ -25,3 +25,30 @@
     border-radius: 50%;
     cursor: pointer;
 }
+
+.dropdown-menu {
+    display: flex;
+    flex-direction: column;
+
+    position: absolute;
+    right: 0;
+    top: 50px;
+
+    background-color: #111;
+    color: #ffffffbb;
+    border-radius: .5rem;
+    overflow: hidden;
+    
+    width: 200px;
+    z-index: 1000;
+  }
+  
+  .dropdown-item {
+    padding: .5rem;
+    cursor: pointer;
+    border-radius: .5rem;
+  }
+  
+  .dropdown-item:hover {
+    color: #fff;
+  }

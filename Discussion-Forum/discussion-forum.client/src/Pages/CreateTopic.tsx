@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../api/axiosConfig';
-import '../css/CreateTopicPost.css';
-import '../App.css';
 
 const CreateTopic = () => {
     const [newTopic, setNewTopic] = useState({ name: '', content: '' });
