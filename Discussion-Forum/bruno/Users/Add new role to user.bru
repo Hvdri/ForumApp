@@ -1,0 +1,17 @@
+meta {
+  name: Add new role to user
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/user/62d5ea84-de31-47ed-b685-04a4ab973d2a/role
+  body: json
+  auth: inherit
+}
+
+body:json {
+  "MODERATOR"
+  
+  
+}

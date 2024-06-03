@@ -63,6 +63,102 @@ namespace Discussion_Forum.Server.Controllers
             return Ok(obfuscatedUser);
         }
 
+        [HttpPost("{id}/role"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddUserRole(Guid id, [FromBody] string roleToAdd)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if(user == null)
+            {               
+                return NotFound();
+            }
+
+            await _userManager.AddToRoleAsync(user, roleToAdd);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}/role"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteUserRole(Guid id, [FromBody] string roleToDelete)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            await _userManager.RemoveFromRoleAsync(user, roleToDelete);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpPut("{id}"), Authorize(Roles = "User, Admin, Moderator")]
+        public async Task<IActionResult> UpdateUser(Guid id, User updatedUser)
+        {
+            if (id.ToString() != updatedUser.Id)
+            {
+                return BadRequest("User id not matching.");
+            }
+
+            _context.Update(updatedUser);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        private bool UserExists(Guid id)
+        {
+            return _context.Users.Any(e => e.Id == id.ToString());
+        }
+
         class ObfuscatedUser
         {
             public string Id { get; set; }
