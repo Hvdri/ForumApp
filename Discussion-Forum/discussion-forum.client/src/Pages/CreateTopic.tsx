@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../api/axiosConfig';
 
 const CreateTopic = () => {
-    const [newTopic, setNewTopic] = useState({ name: '', content: '' });
+    const [newTopic, setNewTopic] = useState({ name: '', description: '' });
     const navigate = useNavigate();
 
     const handleCreateTopic = async (e: React.FormEvent) => {
@@ -11,7 +11,7 @@ const CreateTopic = () => {
         try {
             const response = await axios.post('/topic', newTopic);
             const createdTopicId = response.data.id; // Assuming the created topic ID is returned
-            setNewTopic({ name: '', content: '' });
+            setNewTopic({ name: '', description: '' });
             navigate(`/topic/${createdTopicId}`);
         } catch (error) {
             console.error('Error creating topic', error);
@@ -37,8 +37,8 @@ const CreateTopic = () => {
                     />
                     <label>Topic Content</label>
                     <textarea
-                        value={newTopic.content}
-                        onChange={(e) => setNewTopic({ ...newTopic, content: e.target.value })}
+                        value={newTopic.description}
+                        onChange={(e) => setNewTopic({ ...newTopic, description: e.target.value })}
                         placeholder="Topic content"
                         required
                     ></textarea>

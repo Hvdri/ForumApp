@@ -19,3 +19,18 @@
     justify-content: end;
     gap: 1rem;
 }
+
+.button-group button {
+    background-color:  #333;
+    color: #fff;
+    border: none;
+    padding: .5rem 1rem .5rem 1rem;
+    border-radius: .5rem;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.button-group button:hover {
+    background-color: black;
+    color: white;
+}

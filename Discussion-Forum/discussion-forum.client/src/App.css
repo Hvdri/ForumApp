@@ -2,6 +2,12 @@
     color: white;
 }
 
+button {
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+
 body {
     background-color: #141414;
     color: #e0e0e0;
@@ -45,14 +51,6 @@ input[type="checkbox"] {
 
 span {
     color: #e0e0e0;
-}
-
-button {
-    background-color: #6200ea;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
 }
 
 button:hover {

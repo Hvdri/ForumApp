@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef  } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axiosConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faMessage, faUser, faCircle, faEllipsis } from '@fortawesome/free-solid-svg-icons';
 
 import '../css/Main.css';
 import '../App.css';
@@ -13,6 +13,8 @@ const Posts = () => {
     const location = useLocation();
     const [posts, setPosts] = useState([]);
     const [topic, setTopic] = useState<any>(null);
+    const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (location.state && location.state.topic) {
@@ -55,22 +57,64 @@ const Posts = () => {
         }
     };
 
+    const handleEllipsisClick = (postId: string) => {
+        setVisibleDropdown((prev) => (prev === postId ? null : postId));
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            setVisibleDropdown(null);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     return (
         <div className='main-container'>
             <div className='topic-banner'>
-                {topic && <h2 className='banner-item'>{topic.name}</h2>}
                 <div className='banner-item'>
-                    <button className='banner-group-item' onClick={() => navigate(`/topic/${topicId}/create-post`)}><FontAwesomeIcon className='banner-icon' icon={faPlus} />Create a post</button>
+                    <div className='banner-title-icon'>
+                        <FontAwesomeIcon className='banner-icon' icon={faMessage} />
+                        {topic && <h2 className='banner-name'>{topic.name}</h2>}
+                    </div>
+                    <div className='banner-button-container'>
+                        <button className='banner-group-item' onClick={() => navigate(`/topic/${topicId}/create-post`)}><FontAwesomeIcon className='banner-icon' icon={faPlus} />Create a post</button>
+                    </div>
+                </div>
+                <div className='banner-description'>
+                    {topic && <p>{topic.description}</p>}
                 </div>
             </div>
+
             {posts.length > 0 ? (
                 posts.map((post: any) => (
-                    <div className='post-container'>
-                        <li onClick={() => handlePostClick(post)} key={post.id} className='post-body'>
-                            <h3>{post.title}</h3>
-                            <p>{post.content}</p>
-                            <p>Posted by {post.author.userName} on {new Date(post.createdAt).toLocaleString()}</p>
-                            <button onClick={() => handleDeletePost(post.id)}>Delete</button>
+                    <div className='post-container' key={post.id}>
+                        <li onClick={() => handlePostClick(post)} className='post-body'>
+                            <div className='post-header'>
+                                <p><FontAwesomeIcon icon={faUser} /></p>
+                                <p>{post.author.userName}</p>
+                                <p><FontAwesomeIcon icon={faCircle} /></p>
+                                <p>{new Date(post.createdAt).toLocaleString()}</p>
+                                <div className='post-button' ref={dropdownRef}>
+                                    <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(post.id); }}>
+                                    <FontAwesomeIcon icon={faEllipsis} />
+                                    </button>
+                                    {visibleDropdown === post.id && (
+                                        <div className='dropdown-menu'>
+                                                <div className='dropdown-item' onClick={() => handleDeletePost(post.id)}>Delete</div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div>
+                                <h3>{post.title}</h3>
+                                <p>{post.content}</p>
+                            </div>
                         </li>
                         <p className='line'></p>
                     </div>

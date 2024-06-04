@@ -20,6 +20,11 @@
     height: 100vh;
 }
 
+.title-container {
+    position: absolute;
+    top: 4rem;
+}
+
 .fields-form {
     display: flex;
     flex-direction: column;
@@ -29,6 +34,21 @@
 .fields-form label {
     align-self: flex-start;
     margin-left: -.5rem;
+}
+
+.fields-form button {
+    background-color:  #333;
+    color: #fff;
+    border: none;
+    padding: .5rem 1rem .5rem 1rem;
+    border-radius: .5rem;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.fields-form button:hover {
+    background-color: black;
+    color: white;
 }
 
 .footer-container {
