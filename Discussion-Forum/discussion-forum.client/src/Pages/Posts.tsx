@@ -1,8 +1,8 @@
-import { useEffect, useState, useRef  } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axiosConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faMessage, faUser, faCircle, faEllipsis } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faMessage, faUser, faCircle, faEllipsis, faSort, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
 import '../css/Main.css';
 import '../App.css';
@@ -14,6 +14,8 @@ const Posts = () => {
     const [posts, setPosts] = useState([]);
     const [topic, setTopic] = useState<any>(null);
     const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -67,6 +69,28 @@ const Posts = () => {
         }
     };
 
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
+
+    const handleSortOrderChange = () => {
+        setSortOrder((prevOrder) => (prevOrder === 'newest' ? 'oldest' : 'newest'));
+    };
+
+    const filteredPosts = posts.filter(
+        (post: any) =>
+            post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            post.author.userName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const sortedPosts = filteredPosts.sort((a: any, b: any) => {
+        if (sortOrder === 'newest') {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        } else {
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        }
+    });
+
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
@@ -83,7 +107,9 @@ const Posts = () => {
                         {topic && <h2 className='banner-name'>{topic.name}</h2>}
                     </div>
                     <div className='banner-button-container'>
-                        <button className='banner-group-item' onClick={() => navigate(`/topic/${topicId}/create-post`)}><FontAwesomeIcon className='banner-icon' icon={faPlus} />Create a post</button>
+                        <button className='banner-group-item' onClick={() => navigate(`/topic/${topicId}/create-post`)}>
+                            <FontAwesomeIcon className='banner-icon' icon={faPlus} />Create a post
+                        </button>
                     </div>
                 </div>
                 <div className='banner-description'>
@@ -91,8 +117,23 @@ const Posts = () => {
                 </div>
             </div>
 
-            {posts.length > 0 ? (
-                posts.map((post: any) => (
+            <div className='search-container'>
+                    <FontAwesomeIcon className='search-icon' icon={faMagnifyingGlass} />
+                    <input
+                        type='text'
+                        placeholder='Search Post by title or author...'
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        className='search-bar'
+                    />
+                <button className='sort-button' onClick={handleSortOrderChange}>
+                    <FontAwesomeIcon icon={faSort} />
+                    {sortOrder === 'newest' ? ' Sort by Oldest' : ' Sort by Newest'}
+                </button>
+            </div>
+
+            {sortedPosts.length > 0 ? (
+                sortedPosts.map((post: any) => (
                     <div className='post-container' key={post.id}>
                         <li onClick={() => handlePostClick(post)} className='post-body'>
                             <div className='post-header'>
@@ -102,11 +143,11 @@ const Posts = () => {
                                 <p>{new Date(post.createdAt).toLocaleString()}</p>
                                 <div className='post-button' ref={dropdownRef}>
                                     <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(post.id); }}>
-                                    <FontAwesomeIcon icon={faEllipsis} />
+                                        <FontAwesomeIcon icon={faEllipsis} />
                                     </button>
                                     {visibleDropdown === post.id && (
                                         <div className='dropdown-menu'>
-                                                <div className='dropdown-item' onClick={() => handleDeletePost(post.id)}>Delete</div>
+                                            <div className='dropdown-item' onClick={() => handleDeletePost(post.id)}>Delete</div>
                                         </div>
                                     )}
                                 </div>

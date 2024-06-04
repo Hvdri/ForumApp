@@ -7,9 +7,11 @@ ul, li {
 .sidebar-container {
     display: flex;
     flex-direction: column;
-    padding: 0 2rem 0 2rem;
-    justify-content: center;
     align-items: center;
+    height: 100%;
+    border-right: 1px solid #333;
+
+    padding-top: 1rem;
 }
 
 
@@ -42,3 +44,43 @@ ul, li {
     font-size: 20px;
     padding-right: 1rem;
 }
+
+.topic-search-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 60%;
+    position: relative;
+}
+
+.topic-search-container input {
+    border-radius: 1.5rem;
+    padding: .5rem 2rem .5rem 2rem;
+}
+
+.topic-search-icon {
+    position: absolute;
+    left: -1.5rem;
+    top: .5rem;
+}
+
+/* .search-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    position: relative;
+}
+
+.search-container input {
+    border-radius: 1.5rem;
+    padding: 1rem 2rem 1rem 2rem;
+}
+
+.search-icon {
+    position: absolute;
+    left: -1.25rem;
+    top: 1rem;
+} */

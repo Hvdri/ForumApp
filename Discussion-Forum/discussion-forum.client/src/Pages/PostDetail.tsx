@@ -1,6 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import axios from '../api/axiosConfig';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faMessage } from '@fortawesome/free-solid-svg-icons';
+
+import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
+
+
 
 import '../css/Main.css';
 import '../App.css';
@@ -28,9 +35,11 @@ const PostDetail = () => {
     const { postId } = useParams<{ postId: string }>();
     const location = useLocation();
     const [post, setPost] = useState<Post | null>(null);
-    const [topic, setTopic] = useState<any>(null); // You can replace 'any' with a more specific type if available
+    const [topic, setTopic] = useState<any>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');
+    const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (location.state && location.state.post && location.state.topic) {
@@ -77,46 +86,97 @@ const PostDetail = () => {
     const handleDeleteComment = async (commentId: string) => {
         try {
             await axios.delete(`/comment/${commentId}`);
-            setComments(comments.filter((comment: any) => comment.id !== commentId));
+            setComments(comments.filter((comment) => comment.id !== commentId));
         } catch (error) {
             console.error('Error deleting comment', error);
         }
     };
 
+    const handleEllipsisClick = (commentId: string) => {
+        setVisibleDropdown((prev) => (prev === commentId ? null : commentId));
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            setVisibleDropdown(null);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     return (
         <div className='main-container'>
             {topic && <div className='topic-banner'>
-                <h2 className='banner-item'>{topic.name}</h2>
+                <div className='banner-item'>
+                    <div className='banner-title-icon'>
+                        <FontAwesomeIcon className='banner-icon' icon={faMessage} />
+                        <h2 className='banner-name'>{topic.name}</h2>
+                    </div>
+                </div>
+                <div className='banner-description'>
+                    <p>{topic.description}</p>
+                </div>
             </div>}
             {post ? (
-                <div className='post-detail'>
-                    <h2>{post.title}</h2>
-                    <p>{post.content}</p>
-                    <p>Posted by {post.author.userName} on {new Date(post.createdAt).toLocaleString()}</p>
-                    
-                    {/* Comments Section */}
-                    <div className='comments-section'>
-                        <h3>Comments</h3>
+                <div className='post-container'>
+                    <li className='post-body-detail'>
+                        <div className='post-header'>
+                            <p><FontAwesomeIcon icon={faUser} /></p>
+                            <p>{post.author.userName}</p>
+                            <p><FontAwesomeIcon icon={faCircle} /></p>
+                            <p>{new Date(post.createdAt).toLocaleString()}</p>
+                        </div>
+                        <div>
+                            <h3>{post.title}</h3>
+                            <p>{post.content}</p>
+                        </div>
+                    </li>
+                    <p className='line'></p>
+
+                    <div className='create-comment'>
+                        <textarea
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder='Write a comment...'
+                        />
+                        <div className='button-container'>
+                            <button onClick={handleCreateComment}>Post Comment</button>
+                        </div>
+                    </div>
+                    <div className='post-container'>
                         {comments.length > 0 ? (
-                            comments.map((comment: any) => (
-                                <div key={comment.id} className='comment'>
-                                    <p>{comment.content}</p>
-                                    <p>Commented by {comment.author.userName} on {new Date(comment.createdAt).toLocaleString()}</p>
-                                    <button onClick={() => handleDeleteComment(comment.id)}>Delete</button>
-                                </div>
+                            comments.map((comment: Comment) => (
+                                <li className='post-body-detail'>
+                                    <div key={comment.id} className='post-header'>
+                                        <p><FontAwesomeIcon icon={faUser} /></p>
+                                        <p>{comment.author.userName}</p>
+                                        <p><FontAwesomeIcon icon={faCircle} /></p>
+                                        <p>{new Date(comment.createdAt).toLocaleString()}</p>
+                                        <div className='post-button' ref={dropdownRef}>
+                                            <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(comment.id); }}>
+                                                <FontAwesomeIcon icon={faEllipsis} />
+                                            </button>
+                                            {visibleDropdown === comment.id && (
+                                                <div className='dropdown-menu'>
+                                                    <div className='dropdown-item' onClick={() => handleDeleteComment(comment.id)}>Delete</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p>{comment.content}</p>
+                                    </div>
+                                </li>
                             ))
                         ) : (
                             <p>No comments yet</p>
                         )}
-                        
-                        <div className='create-comment'>
-                            <textarea 
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                placeholder='Write a comment...'
-                            />
-                            <button onClick={handleCreateComment}>Post Comment</button>
-                        </div>
+
                     </div>
                 </div>
             ) : (
