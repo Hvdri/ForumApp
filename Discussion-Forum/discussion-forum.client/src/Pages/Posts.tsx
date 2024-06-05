@@ -59,6 +59,7 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
     const handleDeletePost = async (postId: string) => {
         try {
             await axios.delete(`/post/${postId}`);
+            navigate(`/topic/${topicId}`); // Band-aid fix to refresh the page because delete button was interpreted as a click on the post
             fetchPosts(topicId);
         } catch (error) {
             console.error('Error deleting post', error);
@@ -103,7 +104,7 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
 
     const canDelete = (post: any) => {
         if (!user) return false;
-        return user.id === post.author.id || user.roles.includes('admin') || user.roles.includes('moderator');
+        return user.id === post.author.id || user.roles.includes('Admin') || user.roles.includes('Moderator');
     };
 
     useEffect(() => {
@@ -149,14 +150,14 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
 
             {sortedPosts.length > 0 ? (
                 sortedPosts.map((post: any) => (
-                    <div className='post-container' key={post.id}>
-                        <li onClick={() => handlePostClick(post)} className='post-body'>
+                    <div className='post-container' onClick={() => handlePostClick(post)} key={post.id}>
+                        <li  className='post-body'>
                             <div className='post-header'>
                                 <p><FontAwesomeIcon icon={faUser} /></p>
                                 <p>{post.author.userName}</p>
                                 <p><FontAwesomeIcon icon={faCircle} /></p>
                                 <p>{new Date(post.createdAt).toLocaleString()}</p>
-                                <div className='post-button' ref={dropdownRef}>
+                                <div className='post-button'>
                                     <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(post.id); }}>
                                         <FontAwesomeIcon icon={faEllipsis} />
                                     </button>

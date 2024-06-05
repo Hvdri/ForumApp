@@ -1,0 +1,3 @@
+Removed ref={dropdownRef} Posts.tsx and PostDetail.tsx because it would bug and made it impossible to interract with newly created posts/comments's dropdowns
+
+Band-Aid Fix for navigating back when creating a posts, interprets as click on the post.

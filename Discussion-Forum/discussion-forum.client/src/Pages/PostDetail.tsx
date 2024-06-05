@@ -90,7 +90,7 @@ const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
 
     const canDeleteComment = (comment: Comment) => {
         if (!user) return false;
-        return user.id === comment.author.id || user.roles.includes('admin') || user.roles.includes('moderator');
+        return user.id === comment.author.id || user.roles.includes('Admin') || user.roles.includes('Moderator');
     }
 
     const handleEllipsisClick = (commentId: string) => {
@@ -158,7 +158,7 @@ const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
                                         <p>{comment.author.userName}</p>
                                         <p><FontAwesomeIcon icon={faCircle} /></p>
                                         <p>{new Date(comment.createdAt).toLocaleString()}</p>
-                                        <div className='post-button' ref={dropdownRef}>
+                                        <div className='post-button'>
                                             <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(comment.id); }}>
                                                 <FontAwesomeIcon icon={faEllipsis} />
                                             </button>

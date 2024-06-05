@@ -31,8 +31,8 @@ const CreatePost = () => {
     const handleCreatePost = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/post', { ...newPost, topicId });
-            navigate(`/post/${response.data.id}`);
+            await axios.post('/post', { ...newPost, topicId });
+            navigate(`/topic/${topicId}`);
         } catch (error) {
             console.error('Error creating post', error);
         }
