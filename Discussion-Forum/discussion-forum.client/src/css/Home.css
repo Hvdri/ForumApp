@@ -22,7 +22,7 @@ h2, h3 {
     position: absolute;
     display: flex;
     flex-direction: column;
-    top: 95px;
+    top: 70px;
     left: 250px;
     gap: 1rem;
 }

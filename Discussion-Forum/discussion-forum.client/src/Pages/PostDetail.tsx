@@ -7,34 +7,30 @@ import { faMessage } from '@fortawesome/free-solid-svg-icons';
 
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 
+import { User } from '../App';
 
 
 import '../css/Main.css';
 import '../App.css';
-
-interface Post {
-    id: string;
-    title: string;
-    content: string;
-    author: {
-        userName: string;
-    };
-    createdAt: string;
-}
 
 interface Comment {
     id: string;
     content: string;
     author: {
         userName: string;
+        id: string;
     };
     createdAt: string;
 }
 
-const PostDetail = () => {
+interface PostsDetailProps {
+    user: User | null;
+}
+
+const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
     const { postId } = useParams<{ postId: string }>();
     const location = useLocation();
-    const [post, setPost] = useState<Post | null>(null);
+    const [post, setPost] = useState<any>(null);
     const [topic, setTopic] = useState<any>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');
@@ -91,6 +87,11 @@ const PostDetail = () => {
             console.error('Error deleting comment', error);
         }
     };
+
+    const canDeleteComment = (comment: Comment) => {
+        if (!user) return false;
+        return user.id === comment.author.id || user.roles.includes('admin') || user.roles.includes('moderator');
+    }
 
     const handleEllipsisClick = (commentId: string) => {
         setVisibleDropdown((prev) => (prev === commentId ? null : commentId));
@@ -163,7 +164,7 @@ const PostDetail = () => {
                                             </button>
                                             {visibleDropdown === comment.id && (
                                                 <div className='dropdown-menu'>
-                                                    <div className='dropdown-item' onClick={() => handleDeleteComment(comment.id)}>Delete</div>
+                                                    { canDeleteComment(comment) && <div className='dropdown-item' onClick={() => handleDeleteComment(comment.id)}>Delete</div> }
                                                 </div>
                                             )}
                                         </div>

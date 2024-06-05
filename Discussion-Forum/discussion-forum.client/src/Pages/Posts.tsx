@@ -7,7 +7,13 @@ import { faPlus, faMessage, faUser, faCircle, faEllipsis, faSort, faMagnifyingGl
 import '../css/Main.css';
 import '../App.css';
 
-const Posts = () => {
+import { User } from '../App';
+
+interface PostsProps {
+    user: User | null;
+}
+
+const Posts: React.FC<PostsProps> = ({ user }) => {
     const { topicId } = useParams<{ topicId: string }>();
     const navigate = useNavigate();
     const location = useLocation();
@@ -91,6 +97,15 @@ const Posts = () => {
         }
     });
 
+    const truncateContent = (content: string, length: number) => {
+        return content.length > length ? content.substring(0, length) + '...' : content;
+    };
+
+    const canDelete = (post: any) => {
+        if (!user) return false;
+        return user.id === post.author.id || user.roles.includes('admin') || user.roles.includes('moderator');
+    };
+
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
@@ -128,7 +143,7 @@ const Posts = () => {
                     />
                 <button className='sort-button' onClick={handleSortOrderChange}>
                     <FontAwesomeIcon icon={faSort} />
-                    {sortOrder === 'newest' ? ' Sort by Oldest' : ' Sort by Newest'}
+                    {sortOrder === 'newest' ? ' Sorted by Oldest' : ' Sorted by Newest'}
                 </button>
             </div>
 
@@ -147,14 +162,15 @@ const Posts = () => {
                                     </button>
                                     {visibleDropdown === post.id && (
                                         <div className='dropdown-menu'>
-                                            <div className='dropdown-item' onClick={() => handleDeletePost(post.id)}>Delete</div>
+                                            {/* {canEdit(post) && <div className='dropdown-item'>Edit</div>} */}
+                                            {canDelete(post) && <div className='dropdown-item' onClick={() => handleDeletePost(post.id)}>Delete</div>}
                                         </div>
                                     )}
                                 </div>
                             </div>
                             <div>
                                 <h3>{post.title}</h3>
-                                <p>{post.content}</p>
+                                <p>{truncateContent(post.content, 400)}</p>
                             </div>
                         </li>
                         <p className='line'></p>

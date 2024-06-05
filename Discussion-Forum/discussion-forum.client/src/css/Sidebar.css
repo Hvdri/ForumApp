@@ -64,23 +64,3 @@ ul, li {
     left: -1.5rem;
     top: .5rem;
 }
-
-/* .search-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 80%;
-    position: relative;
-}
-
-.search-container input {
-    border-radius: 1.5rem;
-    padding: 1rem 2rem 1rem 2rem;
-}
-
-.search-icon {
-    position: absolute;
-    left: -1.25rem;
-    top: 1rem;
-} */

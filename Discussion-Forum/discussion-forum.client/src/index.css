@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Montserrat', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -14,6 +16,13 @@
   --color-primary: #646cff;
   --color-black: #242424;
   --color-white: #fff;
+
+  --scrollbar-bg: #242424; /* Default dark theme scrollbar background */
+  --scrollbar-thumb: #444; /* Default dark theme scrollbar thumb */
+
+  /* Light theme scrollbar colors */
+  --scrollbar-bg-light: #f1f1f1;
+  --scrollbar-thumb-light: #888;
 }
 
 h1 {
@@ -25,11 +34,31 @@ a:hover, button:hover {
   transition: all 0.15s ease-in-out;
 }
 
+::-webkit-scrollbar {
+  width: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 1rem;
+  border: 3px solid var(--scrollbar-bg); /* Adds padding around thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: darken(var(--scrollbar-thumb), 10%);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--scrollbar-bg);
+}
+
 @media (prefers-color-scheme: light) {
-  /* :root {
+  :root {
+    --scrollbar-bg: var(--scrollbar-bg-light);
+    --scrollbar-thumb: var(--scrollbar-thumb-light);
   }
-
-  a:hover {
-  } */
-
 }

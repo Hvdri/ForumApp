@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { faFaceKissBeam } from '@fortawesome/free-solid-svg-icons';
 import '../css/Navbar.css';
+import axios from '../api/axiosConfig';
 
 import { User } from '../App';
 
@@ -43,6 +44,30 @@ const Navbar: React.FC<NavbarProps> = ({ user, setUser }) => {
     setUser(null);
     navigate('/login');
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await axios.get('/user/current', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUser(response.data);
+        } catch (error) {
+          console.error('Error fetching user:', error);
+          localStorage.removeItem('token');
+          setUser(null);
+        }
+      }
+    };
+
+    if (!user) {
+      fetchUser();
+    }
+  }, [user, setUser]);
 
   return (
     <div className="navbar">

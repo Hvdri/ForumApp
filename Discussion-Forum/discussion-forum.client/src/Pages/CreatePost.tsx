@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../api/axiosConfig';
 
@@ -11,6 +11,7 @@ const CreatePost = () => {
     const navigate = useNavigate();
     const [newPost, setNewPost] = useState({ title: '', content: '' });
     const [topicName, setTopicName] = useState('');
+    const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         const fetchTopicDetails = async () => {
@@ -41,25 +42,40 @@ const CreatePost = () => {
         navigate(`/topic/${topicId}`);
     };
 
+    const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setNewPost({ ...newPost, content: e.target.value });
+        autoResizeTextArea();
+    };
+
+    const autoResizeTextArea = () => {
+        if (textAreaRef.current) {
+            textAreaRef.current.style.height = 'auto';
+            textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+        }
+    };
+
     return (
         <div className="create-container">
             <div className="create-content">
-                <h2>Create a New Post in "{topicName}"</h2>
+                <p>Create a New Post in</p>
+                <h2>{topicName}</h2>
                 <form onSubmit={handleCreatePost}>
                     <label>Post Title</label>
                     <input
                         type="text"
                         value={newPost.title}
                         onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                        placeholder="Post title"
+                        placeholder="Post title..."
                         required
                     />
                     <label>Post Content</label>
                     <textarea
+                        ref={textAreaRef}
                         value={newPost.content}
-                        onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-                        placeholder="Post content"
+                        onChange={handleTextAreaChange}
+                        placeholder="Post content..."
                         required
+                        className="expanding-textarea"
                     ></textarea>
                     <div className="button-group">
                         <button type="button" onClick={handleCancel}>Cancel</button>

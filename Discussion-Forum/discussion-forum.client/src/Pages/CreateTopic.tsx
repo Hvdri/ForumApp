@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../api/axiosConfig';
+
+import '../css/Main.css';
+import '../App.css';
+import '../css/CreateTopicPost.css';
 
 const CreateTopic = () => {
     const [newTopic, setNewTopic] = useState({ name: '', description: '' });
     const navigate = useNavigate();
+    const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
     const handleCreateTopic = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -22,25 +27,39 @@ const CreateTopic = () => {
         navigate(`/`);
     };
 
+    const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setNewTopic({ ...newTopic, description: e.target.value });
+        autoResizeTextArea();
+    };
+
+    const autoResizeTextArea = () => {
+        if (textAreaRef.current) {
+            textAreaRef.current.style.height = 'auto';
+            textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+        }
+    };
+
     return (
         <div className="create-container">
             <div className='create-content'>
-                <h2>Create a New Topic</h2>
+                <p>Create a New Topic</p>
                 <form onSubmit={handleCreateTopic}>
                     <label>Topic Name</label>
                     <input
                         type="text"
                         value={newTopic.name}
                         onChange={(e) => setNewTopic({ ...newTopic, name: e.target.value })}
-                        placeholder="Topic name"
+                        placeholder="Topic name..."
                         required
                     />
                     <label>Topic Content</label>
                     <textarea
+                        ref={textAreaRef}
                         value={newTopic.description}
-                        onChange={(e) => setNewTopic({ ...newTopic, description: e.target.value })}
-                        placeholder="Topic content"
+                        onChange={handleTextAreaChange}
+                        placeholder="Topic content..."
                         required
+                        className="expanding-textarea"
                     ></textarea>
                     <div className='button-group'>
                         <button type="button" onClick={handleCancel}>Cancel</button>

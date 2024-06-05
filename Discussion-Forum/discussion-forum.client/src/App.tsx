@@ -1,4 +1,5 @@
 import './App.css';
+import './index.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -59,8 +60,8 @@ function App() {
                 <Route path="/" element={<MainLayout topics={topics}><Home /></MainLayout>} />
                 <Route path="/create-topic" element={<MainLayout topics={topics}><PrivateRoute element={CreateTopic} /></MainLayout>} />
                 <Route path="/topic/:topicId/create-post" element={<MainLayout topics={topics}><PrivateRoute element={CreatePost} /></MainLayout>} />
-                <Route path="/post/:postId" element={<MainLayout topics={topics}><PostDetail /></MainLayout>} />
-                <Route path="/topic/:topicId" element={<MainLayout topics={topics}><Posts /></MainLayout>} />
+                <Route path="/post/:postId" element={<MainLayout topics={topics}><PostDetail user={user} /></MainLayout>} />
+                <Route path="/topic/:topicId" element={<MainLayout topics={topics}><Posts user={user} /></MainLayout>} />
             </Routes>
         </BrowserRouter>
     );
