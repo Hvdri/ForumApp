@@ -154,6 +154,13 @@ namespace Discussion_Forum.Server.Controllers
             return NoContent();
         }
 
+        [HttpGet("/roles"), Authorize]
+        public async Task<ActionResult<IEnumerable<IdentityRole>>> GetAllRoles()
+        {
+            var roles = await _context.Roles.ToListAsync();
+            return Ok(roles);
+        }
+
         private bool UserExists(Guid id)
         {
             return _context.Users.Any(e => e.Id == id.ToString());
