@@ -125,7 +125,7 @@ namespace Discussion_Forum.Server.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}"), Authorize(Roles = "User, Admin, Moderator")]
+        [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateUser(Guid id, User updatedUser)
         {
             if (id.ToString() != updatedUser.Id)

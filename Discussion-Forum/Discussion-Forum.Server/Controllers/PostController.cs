@@ -45,7 +45,7 @@ namespace Discussion_Forum.Server.Controllers
             return await _context.Comments.Where(c => c.PostId == id).ToListAsync();
         }
 
-        [HttpPost, Authorize(Roles = "User,Admin,Moderator")]
+        [HttpPost, Authorize]
         public async Task<ActionResult<Post>> CreatePost(CreatePostRequest postRequest)
         {
             var authorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -80,7 +80,7 @@ namespace Discussion_Forum.Server.Controllers
             return CreatedAtAction(nameof(GetPost), new { id = post.Id }, post);
         }
 
-        [HttpPost("{id}/comment"), Authorize(Roles = "User,Admin,Moderator")]
+        [HttpPost("{id}/comment"), Authorize]
         public async Task<ActionResult<Comment>> CreateComment(Guid id, CreateCommentRequest commentRequest)
         {
             var post = await _context.Posts.FindAsync(id);
@@ -112,7 +112,7 @@ namespace Discussion_Forum.Server.Controllers
             return Ok(comment); ;
         }
 
-        [HttpPut("{id}"), Authorize(Roles = "User,Admin,Moderator")]
+        [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdatePost(Guid id, Post updatedPost)
         {
             if (id != updatedPost.Id)
@@ -157,7 +157,7 @@ namespace Discussion_Forum.Server.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}"), Authorize(Roles = "User,Moderator,Admin")]
+        [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeletePost(Guid id)
         {
             var post = await _context.Posts.FindAsync(id);

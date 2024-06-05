@@ -32,7 +32,7 @@ namespace Discussion_Forum.Server.Controllers
             return Ok(comment);
         }
 
-        [HttpPut("{id}"), Authorize(Roles = "User,Admin,Moderator")]
+        [HttpPut("{id}"), Authorize]
         public async Task<IActionResult> UpdateComment(Guid id, Comment updatedComment)
         {
             if (id != updatedComment.Id)
@@ -77,7 +77,7 @@ namespace Discussion_Forum.Server.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}"), Authorize(Roles = "User,Moderator,Admin")]
+        [HttpDelete("{id}"), Authorize]
         public async Task<IActionResult> DeleteComment(Guid id)
         {
             var comment = await _context.Comments.FindAsync(id);

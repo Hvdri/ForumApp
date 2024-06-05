@@ -78,7 +78,7 @@ namespace Discussion_Forum.Server
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-                var roles = new[] { "Admin", "Moderator", "User" };
+                var roles = new[] { "Admin", "Moderator" };
 
                 foreach (var role in roles)
                 {
@@ -95,7 +95,7 @@ namespace Discussion_Forum.Server
                 {
                     new { UserName = "admin@example.com", Email = "admin@example.com", Password = "Admin@123", Role = "Admin" },
                     new { UserName = "moderator@example.com", Email = "moderator@example.com", Password = "Moderator@123", Role = "Moderator" },
-                    new { UserName = "user@example.com", Email = "user@example.com", Password = "User@123", Role = "User" }
+                    new { UserName = "user@example.com", Email = "user@example.com", Password = "User@123", Role = "" }
                 };
 
                 foreach (var userInfo in users)
@@ -113,7 +113,8 @@ namespace Discussion_Forum.Server
                         var result = await userManager.CreateAsync(user, userInfo.Password);
                         if (result.Succeeded)
                         {
-                            await userManager.AddToRoleAsync(user, userInfo.Role);
+                            if (userInfo.Role is not null)
+                                await userManager.AddToRoleAsync(user, userInfo.Role);
                         }
                     }
                 }
