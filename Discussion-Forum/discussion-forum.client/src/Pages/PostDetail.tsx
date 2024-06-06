@@ -2,25 +2,54 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from '../api/axiosConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCircle } from '@fortawesome/free-solid-svg-icons';
-import { faMessage } from '@fortawesome/free-solid-svg-icons';
-
-import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
-
+import { faUser, faCircle, faMessage, faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import { User } from '../App';
-
-
 import '../css/Main.css';
 import '../App.css';
+
+interface Author {
+    userName: string;
+    id: string;
+    createdAt: string;
+    lastUpdatedAt: string;
+    lastLogin: string;
+    email: string;
+    normalizedUserName: string;
+    normalizedEmail: string;
+    emailConfirmed: boolean;
+    passwordHash: string;
+    securityStamp: string;
+    concurrencyStamp: string;
+    phoneNumber: string | null;
+    phoneNumberConfirmed: boolean;
+    twoFactorEnabled: boolean;
+    lockoutEnd: string | null;
+    lockoutEnabled: boolean;
+    accessFailedCount: number;
+}
+
+interface Topic {
+    id: string;
+    name: string;
+    description: string;
+}
+
+interface Post {
+    id: string;
+    title: string;
+    content: string;
+    author: Author;
+    createdAt: string;
+    topicId: string;
+    topic: Topic;
+}
 
 interface Comment {
     id: string;
     content: string;
-    author: {
-        userName: string;
-        id: string;
-    };
+    author: Author;
     createdAt: string;
+    postId: string;
 }
 
 interface PostsDetailProps {
@@ -31,10 +60,15 @@ const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
     const { postId } = useParams<{ postId: string }>();
     const location = useLocation();
     const navigate = useNavigate();
-    const [post, setPost] = useState<any>(null);
-    const [topic, setTopic] = useState<any>(null);
+    const [post, setPost] = useState<Post | null>(null);
+    const [topic, setTopic] = useState<Topic | null>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');
+    const [editingPost, setEditingPost] = useState(false);
+    const [editingPostContent, setEditingPostContent] = useState('');
+    const [editingPostTitle, setEditingPostTitle] = useState('');
+    const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+    const [editingCommentContent, setEditingCommentContent] = useState('');
     const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -89,13 +123,82 @@ const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
         }
     };
 
-    const canDeleteComment = (comment: Comment) => {
-        if (!user) return false;
-        return user.id === comment.author.id || user.roles.includes('Admin') || user.roles.includes('Moderator');
-    }
+    const handleEditPost = () => {
+        if (post) {
+            setEditingPost(true);
+            setEditingPostTitle(post.title);
+            setEditingPostContent(post.content);
+        }
+    };
 
-    const handleEllipsisClick = (commentId: string) => {
-        setVisibleDropdown((prev) => (prev === commentId ? null : commentId));
+    const handleUpdatePost = async () => {
+        if (!editingPostTitle.trim() || !editingPostContent.trim() || !post) return;
+
+        try {
+            await axios.put(`/post/${post.id}`, {
+                Id: post.id,
+                Title: editingPostTitle,
+                Content: editingPostContent,
+                AuthorId: post.author.id,
+                author: post.author,
+                TopicId: post.topicId,
+                topic: post.topic,
+            });
+            setPost({
+                ...post,
+                title: editingPostTitle,
+                content: editingPostContent,
+            });
+            setEditingPost(false);
+        } catch (error) {
+            console.error('Error updating post', error);
+        }
+    };
+
+    const handleDeletePost = async () => {
+        if (!post) return;
+
+        try {
+            await axios.delete(`/post/${post.id}`);
+            navigate(-1);
+        } catch (error) {
+            console.error('Error deleting post', error);
+        }
+    };
+
+    const handleEditComment = (comment: Comment) => {
+        setEditingCommentId(comment.id);
+        setEditingCommentContent(comment.content);
+    };
+
+    const handleUpdateComment = async (comment: Comment) => {
+        if (!editingCommentContent.trim()) return;
+
+        try {
+            await axios.put(`/comment/${comment.id}`, {
+                id: comment.id,
+                content: editingCommentContent,
+                postId: comment.postId,
+                authorId: comment.author.id,
+                author: comment.author,
+            });
+            setComments(comments.map((c) =>
+                c.id === comment.id ? { ...c, content: editingCommentContent } : c
+            ));
+            setEditingCommentId(null);
+            setEditingCommentContent('');
+        } catch (error) {
+            console.error('Error updating comment', error);
+        }
+    };
+
+    const canEditOrDelete = (authorId: string) => {
+        if (!user) return false;
+        return user.id === authorId || user.roles.includes('Admin') || user.roles.includes('Moderator');
+    };
+
+    const handleEllipsisClick = (id: string) => {
+        setVisibleDropdown((prev) => (prev === id ? null : id));
     };
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -139,19 +242,49 @@ const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
                             <button className='view-profile-button' onClick={(e) => { e.stopPropagation(); handleUserClick(post.author.id); }}>
                                 View Profile
                             </button>
+                            <div className='post-button'>
+                                <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(post.id); }}>
+                                    <FontAwesomeIcon icon={faEllipsis} />
+                                </button>
+                                {visibleDropdown === post.id && (
+                                    <div className='dropdown-menu'>
+                                        {canEditOrDelete(post.author.id) && <div className='dropdown-item' onClick={handleEditPost}>Edit</div>}
+                                        {canEditOrDelete(post.author.id) && <div className='dropdown-item' onClick={handleDeletePost}>Delete</div>}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <div>
-                            <h3>{post.title}</h3>
-                            <p>{post.content}</p>
-                        </div>
+                        {editingPost ? (
+                            <div className='edit-post'>
+                                <input
+                                    type='text'
+                                    value={editingPostTitle}
+                                    onChange={(e) => setEditingPostTitle(e.target.value)}
+                                />
+                                <textarea
+                                    value={editingPostContent}
+                                    onChange={(e) => setEditingPostContent(e.target.value)}
+                                    className='expanding-textarea'
+                                />
+                                <div className='button-container'>
+                                    <button onClick={handleUpdatePost}>Update</button>
+                                    <button onClick={() => setEditingPost(false)}>Cancel</button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                <h3>{post.title}</h3>
+                                <p>{post.content}</p>
+                            </div>
+                        )}
                     </li>
                     <p className='line'></p>
-
                     <div className='create-comment'>
                         <textarea
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             placeholder='Write a comment...'
+                            className="expanding-textarea"
                         />
                         <div className='button-container'>
                             <button onClick={handleCreateComment}>Post Comment</button>
@@ -160,13 +293,13 @@ const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
                     <div className='post-container'>
                         {comments.length > 0 ? (
                             comments.map((comment: Comment) => (
-                                <li className='post-body-detail'>
-                                    <div key={comment.id} className='post-header'>
+                                <li key={comment.id} className='post-body-detail'>
+                                    <div className='post-header'>
                                         <p><FontAwesomeIcon icon={faUser} /></p>
                                         <p>{comment.author.userName}</p>
                                         <p><FontAwesomeIcon icon={faCircle} /></p>
                                         <p>{new Date(comment.createdAt).toLocaleString()}</p>
-                                        <button className='view-profile-button' onClick={(e) => { e.stopPropagation(); handleUserClick(post.author.id); }}>
+                                        <button className='view-profile-button' onClick={(e) => { e.stopPropagation(); handleUserClick(comment.author.id); }}>
                                             View Profile
                                         </button>
                                         <div className='post-button'>
@@ -175,20 +308,34 @@ const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
                                             </button>
                                             {visibleDropdown === comment.id && (
                                                 <div className='dropdown-menu'>
-                                                    {canDeleteComment(comment) && <div className='dropdown-item' onClick={() => handleDeleteComment(comment.id)}>Delete</div>}
+                                                    {canEditOrDelete(comment.author.id) && <div className='dropdown-item' onClick={() => handleEditComment(comment)}>Edit</div>}
+                                                    {canEditOrDelete(comment.author.id) && <div className='dropdown-item' onClick={() => handleDeleteComment(comment.id)}>Delete</div>}
                                                 </div>
                                             )}
                                         </div>
                                     </div>
                                     <div>
-                                        <p>{comment.content}</p>
+                                        {editingCommentId === comment.id ? (
+                                            <div className='edit-comment'>
+                                                <textarea
+                                                    value={editingCommentContent}
+                                                    onChange={(e) => setEditingCommentContent(e.target.value)}
+                                                    className='expanding-textarea'
+                                                />
+                                                <div className='button-container'>
+                                                    <button onClick={() => handleUpdateComment(comment)}>Update</button>
+                                                    <button onClick={() => setEditingCommentId(null)}>Cancel</button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p>{comment.content}</p>
+                                        )}
                                     </div>
                                 </li>
                             ))
                         ) : (
                             <p>No comments yet</p>
                         )}
-
                     </div>
                 </div>
             ) : (

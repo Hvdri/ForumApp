@@ -170,8 +170,7 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
                                     </button>
                                     {visibleDropdown === post.id && (
                                         <div className='dropdown-menu'>
-                                            {/* {canEdit(post) && <div className='dropdown-item'>Edit</div>} */}
-                                            {canDelete(post) && <div className='dropdown-item' onClick={() => handleDeletePost(post.id)}>Delete</div>}
+                                            {/* functions */}
                                         </div>
                                     )}
                                 </div>
