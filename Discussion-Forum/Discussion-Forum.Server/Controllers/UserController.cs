@@ -144,34 +144,34 @@ namespace Discussion_Forum.Server.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}"), Authorize]
-        public async Task<IActionResult> UpdateUser(Guid id, User updatedUser)
-        {
-            if (id.ToString() != updatedUser.Id)
-            {
-                return BadRequest("User id not matching.");
-            }
+        //[HttpPut("{id}"), Authorize]
+        //public async Task<IActionResult> UpdateUser(Guid id, User updatedUser)
+        //{
+        //    if (id.ToString() != updatedUser.Id)
+        //    {
+        //        return BadRequest("User id not matching.");
+        //    }
 
-            _context.Update(updatedUser);
+        //    _context.Update(updatedUser);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!UserExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         [HttpGet("/roles"), Authorize]
         public async Task<ActionResult<IEnumerable<IdentityRole>>> GetAllRoles()

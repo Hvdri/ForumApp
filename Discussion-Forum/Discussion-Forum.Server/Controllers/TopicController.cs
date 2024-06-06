@@ -60,6 +60,7 @@ namespace Discussion_Forum.Server.Controllers
                 return BadRequest("Topic id not matching.");
             }
 
+            _context.Topics.Update(updatedTopic);
             _context.Entry(updatedTopic).State = EntityState.Modified;
 
             try

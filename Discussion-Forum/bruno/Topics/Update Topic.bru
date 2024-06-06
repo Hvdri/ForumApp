@@ -1,0 +1,19 @@
+meta {
+  name: Update Topic
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/topic/B3391E80-CBF3-43EA-B86E-E0571B931FEC
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "Id": "B3391E80-CBF3-43EA-B86E-E0571B931FEC",
+    "Name": "Crochet",
+    "Description": "Welcome to Crocheting Discussion! I hope you enjoy your time here. Please be respectful to each other, and in case you share pattern spoilers, put #spoiler at the start of the comment. Stay on topic, don't spam and  use appropriate language"
+  }
+}
