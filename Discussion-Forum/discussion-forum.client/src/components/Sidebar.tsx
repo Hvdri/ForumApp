@@ -15,7 +15,7 @@ const Sidebar = ({ topics }: { topics: any[] }) => {
     const handleTopicClick = (topic: any) => {
         setSelectedTopicId(topic.id);
         setIsCreatingTopic(false);
-        navigate(`/topic/${topic.id}`, { state: { topic } });
+        navigate(`/topic/${topic.id}`);
     };
 
     const handleCreateTopicClick = () => {

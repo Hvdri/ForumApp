@@ -16,22 +16,28 @@ interface PostsProps {
 const Posts: React.FC<PostsProps> = ({ user }) => {
     const { topicId } = useParams<{ topicId: string }>();
     const navigate = useNavigate();
-    const location = useLocation();
     const [posts, setPosts] = useState([]);
     const [topic, setTopic] = useState<any>(null);
+    const [editingTopic, setEditingTopic] = useState(false);
+    const [editingTopicName, setEditingTopicName] = useState('');
+    const [editingTopicDescription, setEditingTopicDescription] = useState('');
     const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (location.state && location.state.topic) {
-            setTopic(location.state.topic);
-        } else if (topicId) {
+        console.log("topic" + topicId)
+        if (topicId) {
             fetchTopic(topicId);
+            fetchPosts(topicId);
         }
-        fetchPosts(topicId);
-    }, [topicId]);
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const fetchTopic = async (topicId: string) => {
         try {
@@ -54,16 +60,6 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
 
     const handlePostClick = (post: any) => {
         navigate(`/post/${post.id}`, { state: { post, topic } });
-    };
-
-    const handleDeletePost = async (postId: string) => {
-        try {
-            await axios.delete(`/post/${postId}`);
-            navigate(`/topic/${topicId}`); // Band-aid fix to refresh the page because delete button was interpreted as a click on the post
-            fetchPosts(topicId);
-        } catch (error) {
-            console.error('Error deleting post', error);
-        }
     };
 
     const handleEllipsisClick = (postId: string) => {
@@ -102,34 +98,98 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
         return content.length > length ? content.substring(0, length) + '...' : content;
     };
 
-    const canDelete = (post: any) => {
+    const canEditOrDelete = () => {
         if (!user) return false;
-        return user.id === post.author.id || user.roles.includes('Admin') || user.roles.includes('Moderator');
+        return user.roles.includes('Admin') || user.roles.includes('Moderator');
+    };
+
+    const handleEditTopic = () => {
+        if (topic) {
+            setEditingTopic(true);
+            setEditingTopicName(topic.name);
+            setEditingTopicDescription(topic.description);
+        }
+    };
+
+    const handleUpdateTopic = async () => {
+        if (!editingTopicName.trim() || !editingTopicDescription.trim() || !topic) return;
+
+        try {
+            await axios.put(`/topic/${topic.id}`, {
+                Id: topic.id,
+                Name: editingTopicName,
+                Description: editingTopicDescription,
+            });
+            setTopic({
+                ...topic,
+                name: editingTopicName,
+                description: editingTopicDescription,
+            });
+            setEditingTopic(false);
+        } catch (error) {
+            console.error('Error updating topic', error);
+        }
+    };
+
+    const handleDeleteTopic = async () => {
+        if (!topic) return;
+
+        try {
+            await axios.delete(`/topic/${topic.id}`);
+            navigate(-1);
+        } catch (error) {
+            console.error('Error deleting topic', error);
+        }
     };
 
     const handleUserClick = (userId: string) => {
         navigate(`/profile/${userId}`);
     };
 
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
     return (
         <div className='main-container'>
+            
             <div className='topic-banner'>
                 <div className='banner-item'>
                     <div className='banner-title-icon'>
                         <FontAwesomeIcon className='banner-icon' icon={faMessage} />
-                        {topic && <h2 className='banner-name'>{topic.name}</h2>}
+                        {topic && (
+                            editingTopic ? (
+                                <div className='edit-topic'>
+                                    <input
+                                        type='text'
+                                        value={editingTopicName}
+                                        onChange={(e) => setEditingTopicName(e.target.value)}
+                                    />
+                                    <textarea
+                                        value={editingTopicDescription}
+                                        onChange={(e) => setEditingTopicDescription(e.target.value)}
+                                    />
+                                    <div className='button-container'>
+                                        <button onClick={handleUpdateTopic}>Update</button>
+                                        <button onClick={() => setEditingTopic(false)}>Cancel</button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <h2 className='banner-name'>{topic.name}</h2>
+                            )
+                        )}
                     </div>
                     <div className='banner-button-container'>
                         <button className='banner-group-item' onClick={() => navigate(`/topic/${topicId}/create-post`)}>
                             <FontAwesomeIcon className='banner-icon' icon={faPlus} />Create a post
                         </button>
+                        <div className='post-button'>
+                            <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(topic.id); }}>
+                                <FontAwesomeIcon icon={faEllipsis} />
+                            </button>
+                            {topic && (visibleDropdown === topic.id) && (
+                                <div className='dropdown-menu'>
+                                    {canEditOrDelete() && <div className='dropdown-item' onClick={handleEditTopic}>Edit</div>}
+                                    {canEditOrDelete() && <div className='dropdown-item' onClick={handleDeleteTopic}>Delete</div>}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div className='banner-description'>
