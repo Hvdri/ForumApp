@@ -55,6 +55,11 @@ namespace Discussion_Forum.Server.Controllers
                 return NotFound("Author not found.");
             }
 
+            if (CheckBannedUser())
+            {
+                return Forbid();
+            }
+
             var topic = await _context.Topics.FindAsync(postRequest.TopicId);
             if (topic == null)
             {
@@ -89,6 +94,11 @@ namespace Discussion_Forum.Server.Controllers
                 return BadRequest("Post does not exist.");
             }
 
+            if (CheckBannedUser())
+            {
+                return Forbid();
+            }
+
             var authorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var author = await _context.Users.FindAsync(authorId);
             if (author == null)
@@ -118,6 +128,11 @@ namespace Discussion_Forum.Server.Controllers
             if (id != updatedPost.Id)
             {
                 return BadRequest();
+            }
+
+            if (CheckBannedUser())
+            {
+                return Forbid();
             }
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -168,6 +183,11 @@ namespace Discussion_Forum.Server.Controllers
                 return NotFound();
             }
 
+            if (CheckBannedUser())
+            {
+                return Forbid();
+            }
+
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var isSuperUser = CheckSuperUser();
@@ -203,6 +223,10 @@ namespace Discussion_Forum.Server.Controllers
         public class CreateCommentRequest
         {
             public string Content { get; set; }
+        }
+        private bool CheckBannedUser()
+        {
+            return User.IsInRole("Banned");
         }
     }
 }

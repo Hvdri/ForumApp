@@ -78,7 +78,7 @@ namespace Discussion_Forum.Server
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-                var roles = new[] { "Admin", "Moderator" };
+                var roles = new[] { "Admin", "Moderator", "Banned" };
 
                 foreach (var role in roles)
                 {
