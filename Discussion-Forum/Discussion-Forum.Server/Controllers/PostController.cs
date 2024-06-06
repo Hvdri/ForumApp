@@ -135,6 +135,7 @@ namespace Discussion_Forum.Server.Controllers
             {
                 return Forbid();
             }
+            updatedPost.UpdatedAt = DateTime.Now;
             _context.Entry(existingPost).State = EntityState.Detached;
             _context.Posts.Update(updatedPost);
             _context.Entry(updatedPost).State = EntityState.Modified;

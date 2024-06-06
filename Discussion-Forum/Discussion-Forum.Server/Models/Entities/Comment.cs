@@ -9,7 +9,7 @@ namespace Discussion_Forum.Server.Models.Entities
 
         public Guid PostId { get; set; }
         [JsonIgnore]
-        public virtual Post Post { get; set; }
+        public virtual Post? Post { get; set; }
         public string AuthorId { get; set; }
         public virtual User Author { get; set; }
 

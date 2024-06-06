@@ -56,7 +56,8 @@ namespace Discussion_Forum.Server.Controllers
                 return Forbid();
             }
 
-            _context.Entry(updatedComment).State = EntityState.Modified;
+            existingComment.Content = updatedComment.Content;
+            existingComment.UpdatedAt = DateTime.Now;
 
             try
             {
