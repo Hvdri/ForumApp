@@ -83,9 +83,36 @@
     color: #c0c0c0;
 }
 
+.view-profile-button {
+    display: none;
+    position: absolute;
+    top: 0;
+    transform: translateY(-50%);
+    left: 0px;
+    padding: 5px 10px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 1rem;
+    cursor: pointer;
+    border: none;
+
+}
+
+.view-profile-button:hover {
+    background-color: #444;
+
+}
+
+.post-header:hover .view-profile-button {
+    display: block;
+}
+
 .post-header {
+    position: relative;
     display: flex;
     align-items: center;
+    cursor: pointer;
     gap: .5rem;
 }
 

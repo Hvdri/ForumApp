@@ -1,0 +1,46 @@
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { User } from '../App';
+import '../css/Profile.css';
+import axios from '../api/axiosConfig';
+
+const Profile: React.FC = () => {
+    const { userId } = useParams<{ userId: string }>();
+    const [user, setUser] = useState<User | null>(null);
+    
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await axios.get(`/user/${userId}`);
+                setUser(response.data);
+            } catch (error) {
+                console.error('Error fetching user:', error);
+            }
+        };
+
+        if (userId) {
+            fetchUser();
+        }
+    }, [userId]);
+
+    if (!user) {
+        return (
+            <div className="main-container">
+                <h1>User Profile</h1>
+                <p>You need to be logged in to view this page.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="main-container">
+            <h2>User Profile</h2>
+            <div className="profile-details">
+                <p>Username: {user.name}</p>
+                <p>Roles: {(user.roles && user.roles.length > 0) ? user.roles.join(', ') : 'User'}</p>
+            </div>
+        </div>
+    );
+};
+
+export default Profile;

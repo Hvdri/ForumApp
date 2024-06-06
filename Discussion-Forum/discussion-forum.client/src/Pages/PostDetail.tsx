@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from '../api/axiosConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faCircle } from '@fortawesome/free-solid-svg-icons';
@@ -30,6 +30,7 @@ interface PostsDetailProps {
 const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
     const { postId } = useParams<{ postId: string }>();
     const location = useLocation();
+    const navigate = useNavigate();
     const [post, setPost] = useState<any>(null);
     const [topic, setTopic] = useState<any>(null);
     const [comments, setComments] = useState<Comment[]>([]);
@@ -103,6 +104,10 @@ const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
         }
     };
 
+    const handleUserClick = (userId: string) => {
+        navigate(`/profile/${userId}`);
+    };
+
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
@@ -131,6 +136,9 @@ const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
                             <p>{post.author.userName}</p>
                             <p><FontAwesomeIcon icon={faCircle} /></p>
                             <p>{new Date(post.createdAt).toLocaleString()}</p>
+                            <button className='view-profile-button' onClick={(e) => { e.stopPropagation(); handleUserClick(post.author.id); }}>
+                                View Profile
+                            </button>
                         </div>
                         <div>
                             <h3>{post.title}</h3>
@@ -158,13 +166,16 @@ const PostDetail: React.FC<PostsDetailProps> = ({ user }) => {
                                         <p>{comment.author.userName}</p>
                                         <p><FontAwesomeIcon icon={faCircle} /></p>
                                         <p>{new Date(comment.createdAt).toLocaleString()}</p>
+                                        <button className='view-profile-button' onClick={(e) => { e.stopPropagation(); handleUserClick(post.author.id); }}>
+                                            View Profile
+                                        </button>
                                         <div className='post-button'>
                                             <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(comment.id); }}>
                                                 <FontAwesomeIcon icon={faEllipsis} />
                                             </button>
                                             {visibleDropdown === comment.id && (
                                                 <div className='dropdown-menu'>
-                                                    { canDeleteComment(comment) && <div className='dropdown-item' onClick={() => handleDeleteComment(comment.id)}>Delete</div> }
+                                                    {canDeleteComment(comment) && <div className='dropdown-item' onClick={() => handleDeleteComment(comment.id)}>Delete</div>}
                                                 </div>
                                             )}
                                         </div>

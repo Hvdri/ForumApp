@@ -63,6 +63,25 @@ namespace Discussion_Forum.Server.Controllers
             return Ok(obfuscatedUser);
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<User>> GetUser(Guid id)
+        {
+            var user = await _context.Users.FindAsync(id.ToString());
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var obfuscatedUser = new ObfuscatedUser();
+            obfuscatedUser.Id = user.Id;
+            obfuscatedUser.Email = user.Email;
+            obfuscatedUser.Name = user.UserName;
+            obfuscatedUser.Roles = await _userManager.GetRolesAsync(user);
+
+            return Ok(obfuscatedUser);
+        }   
+
         [HttpPost("{id}/role"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddUserRole(Guid id, [FromBody] string roleToAdd)
         {

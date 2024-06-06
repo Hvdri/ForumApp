@@ -107,6 +107,10 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
         return user.id === post.author.id || user.roles.includes('Admin') || user.roles.includes('Moderator');
     };
 
+    const handleUserClick = (userId: string) => {
+        navigate(`/profile/${userId}`);
+    };
+
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
@@ -134,14 +138,14 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
             </div>
 
             <div className='search-container'>
-                    <FontAwesomeIcon className='search-icon' icon={faMagnifyingGlass} />
-                    <input
-                        type='text'
-                        placeholder='Search Post by title or author...'
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        className='search-bar'
-                    />
+                <FontAwesomeIcon className='search-icon' icon={faMagnifyingGlass} />
+                <input
+                    type='text'
+                    placeholder='Search Post by title or author...'
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    className='search-bar'
+                />
                 <button className='sort-button' onClick={handleSortOrderChange}>
                     <FontAwesomeIcon icon={faSort} />
                     {sortOrder === 'newest' ? ' Sorted by Oldest' : ' Sorted by Newest'}
@@ -150,13 +154,16 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
 
             {sortedPosts.length > 0 ? (
                 sortedPosts.map((post: any) => (
-                    <div className='post-container' onClick={() => handlePostClick(post)} key={post.id}>
-                        <li  className='post-body'>
+                    <div className='post-container' key={post.id}>
+                        <li className='post-body' onClick={() => handlePostClick(post)}>
                             <div className='post-header'>
                                 <p><FontAwesomeIcon icon={faUser} /></p>
                                 <p>{post.author.userName}</p>
                                 <p><FontAwesomeIcon icon={faCircle} /></p>
                                 <p>{new Date(post.createdAt).toLocaleString()}</p>
+                                <button className='view-profile-button' onClick={(e) => { e.stopPropagation(); handleUserClick(post.author.id); }}>
+                                    View Profile
+                                </button>
                                 <div className='post-button'>
                                     <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(post.id); }}>
                                         <FontAwesomeIcon icon={faEllipsis} />

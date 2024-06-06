@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import axios from './api/axiosConfig';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
+import Profile from './pages/Profile';
 
 import AuthLayout from './layout/AuthLayout';
 import MainLayout from './layout/MainLayout';
@@ -62,6 +63,7 @@ function App() {
                 <Route path="/topic/:topicId/create-post" element={<MainLayout topics={topics}><PrivateRoute element={CreatePost} /></MainLayout>} />
                 <Route path="/post/:postId" element={<MainLayout topics={topics}><PostDetail user={user} /></MainLayout>} />
                 <Route path="/topic/:topicId" element={<MainLayout topics={topics}><Posts user={user} /></MainLayout>} />
+                <Route path="/profile/:userId" element={<MainLayout topics={topics}><Profile /></MainLayout>} />
             </Routes>
         </BrowserRouter>
     );

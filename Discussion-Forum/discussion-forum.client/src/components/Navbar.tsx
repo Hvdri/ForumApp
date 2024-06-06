@@ -5,6 +5,8 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { faFaceKissBeam } from '@fortawesome/free-solid-svg-icons';
 import '../css/Navbar.css';
 import axios from '../api/axiosConfig';
+import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
+
 
 import { User } from '../App';
 
@@ -45,6 +47,12 @@ const Navbar: React.FC<NavbarProps> = ({ user, setUser }) => {
     navigate('/login');
   };
 
+  const handleProfileClick = () => {
+    if (user)
+      navigate(`/profile/${user.id}`);
+    setDropdownVisible(false);
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       const token = localStorage.getItem('token');
@@ -77,15 +85,22 @@ const Navbar: React.FC<NavbarProps> = ({ user, setUser }) => {
       <div className="navbar-user" onClick={handleUserClick} ref={dropdownRef}>
         <FontAwesomeIcon icon={faUser} className="icon" />
         {dropdownVisible && (
-          <div className="dropdown-menu">
+          <div >
             {user ? (
-              <>
-                <div className="dropdown-item">{user.name}</div>
-                <div className="dropdown-item">{user.roles.join(', ')}</div>
-                <div className="dropdown-item" onClick={handleLogout}>Logout</div>
-              </>
+              <div className="dropdown-menu">
+                <div className='dropdown-item'  onClick={handleProfileClick}>
+                  <p className='dropdown-icon-user'><FontAwesomeIcon icon={faCircleUser} /></p>
+                  <div className='dropdown-user'>
+                    <p className=''>{user.name}</p>
+                    <p className='dropdown-role'>{(user.roles && user.roles.length > 0) ? user.roles.join(', ') : 'User'}</p>
+                  </div>
+                </div>
+                <p className="dropdown-item" onClick={handleLogout}>Logout</p>
+              </div>
             ) : (
-              <div className="dropdown-item" onClick={() => navigate('/login')}>Login</div>
+              <div className="dropdown-menu">
+                <div className="dropdown-item" onClick={() => navigate('/login')}>Login</div>
+              </div>
             )}
           </div>
         )}
