@@ -11,9 +11,10 @@ import { User } from '../App';
 
 interface PostsProps {
     user: User | null;
+    updateTopics: () => Promise<void>;
 }
 
-const Posts: React.FC<PostsProps> = ({ user }) => {
+const Posts: React.FC<PostsProps> = ({ user, updateTopics  }) => {
     const { topicId } = useParams<{ topicId: string }>();
     const navigate = useNavigate();
     const location = useLocation();
@@ -123,6 +124,7 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
                 description: editingTopicDescription,
             });
             setEditingTopic(false);
+            await updateTopics();
         } catch (error) {
             console.error('Error updating topic', error);
         }
@@ -133,6 +135,7 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
 
         try {
             await axios.delete(`/topic/${topic.id}`);
+            await updateTopics();
             navigate(-1);
         } catch (error) {
             console.error('Error deleting topic', error);

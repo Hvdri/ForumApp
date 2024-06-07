@@ -50,7 +50,9 @@ function App() {
             console.error('Error fetching user', error);
         }
     };
-
+    const updateTopics = async () => {
+        await fetchTopics();
+    };
     return (
         <BrowserRouter>
             <Navbar user={user} setUser={setUser} />
@@ -59,10 +61,10 @@ function App() {
                 <Route path="/login" element={<AuthLayout><Login setUser={setUser}/></AuthLayout>} />
                 <Route path="/register" element={<AuthLayout><Register /></AuthLayout>} />
                 <Route path="/" element={<MainLayout topics={topics}><Home /></MainLayout>} />
-                <Route path="/create-topic" element={<MainLayout topics={topics}><PrivateRoute element={CreateTopic} /></MainLayout>} />
+                <Route path="/create-topic" element={<MainLayout topics={topics}><PrivateRoute element={() => <CreateTopic updateTopics={updateTopics} />} /></MainLayout>} />
                 <Route path="/topic/:topicId/create-post" element={<MainLayout topics={topics}><PrivateRoute element={CreatePost} /></MainLayout>} />
                 <Route path="/post/:postId" element={<MainLayout topics={topics}><PostDetail user={user} /></MainLayout>} />
-                <Route path="/topic/:topicId" element={<MainLayout topics={topics}><Posts user={user} /></MainLayout>} />
+                <Route path="/topic/:topicId" element={<MainLayout topics={topics}><Posts user={user} updateTopics={updateTopics} /></MainLayout>} />
                 <Route path="/profile/:userId" element={<MainLayout topics={topics}><Profile /></MainLayout>} />
             </Routes>
         </BrowserRouter>

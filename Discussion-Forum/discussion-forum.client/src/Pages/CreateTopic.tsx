@@ -6,7 +6,7 @@ import '../css/Main.css';
 import '../App.css';
 import '../css/CreateTopicPost.css';
 
-const CreateTopic = () => {
+const CreateTopic = ({ updateTopics }: { updateTopics: () => Promise<void> }) => {
     const [newTopic, setNewTopic] = useState({ name: '', description: '' });
     const navigate = useNavigate();
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -17,6 +17,7 @@ const CreateTopic = () => {
             const response = await axios.post('/topic', newTopic);
             const createdTopicId = response.data.id; // Assuming the created topic ID is returned
             setNewTopic({ name: '', description: '' });
+            await updateTopics();
             navigate(`/topic/${createdTopicId}`);
         } catch (error) {
             console.error('Error creating topic', error);
