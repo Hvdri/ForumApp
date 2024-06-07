@@ -102,7 +102,7 @@ const Profile: React.FC = () => {
         );
     }
 
-    const isAdmin = currentUser?.roles.includes('User');
+    const isAdmin = currentUser?.roles.includes('Admin');
 
     return (
 
