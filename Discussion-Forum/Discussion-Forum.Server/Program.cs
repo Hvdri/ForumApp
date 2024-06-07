@@ -1,6 +1,7 @@
 
 using Discussion_Forum.Server.Database;
 using Discussion_Forum.Server.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -9,15 +10,33 @@ namespace Discussion_Forum.Server
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             builder.WebHost.UseUrls("http://*:8080");
 
             // Add services to the container.
-
             builder.Services.AddControllers();
+
+            builder.Services.AddDbContext<ForumDbContext>(options =>
+                options.UseLazyLoadingProxies(true)
+                    .UseSqlServer(builder.Configuration.GetConnectionString("Forum"))
+            );
+
+            builder.Services.AddIdentityApiEndpoints<User>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ForumDbContext>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder => builder
+                        .WithOrigins("https://localhost:5173") // Update this to your React app's URL
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -32,15 +51,10 @@ namespace Discussion_Forum.Server
                 options.OperationFilter<SecurityRequirementsOperationFilter>();
             });
 
-            builder.Services.AddDbContext<ForumDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("Forum")));
-
             builder.Services.AddAuthorization();
 
-            builder.Services.AddIdentityApiEndpoints<User>().AddEntityFrameworkStores<ForumDbContext>();
-
             var app = builder.Build();
-
+            app.UseCors("AllowSpecificOrigin");
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
@@ -53,14 +67,57 @@ namespace Discussion_Forum.Server
 
             app.MapIdentityApi<User>();
 
-            app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 
-            app.MapFallbackToFile("/index.html");
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+                var roles = new[] { "Admin", "Moderator", "Banned" };
+
+                foreach (var role in roles)
+                {
+                    if (!await roleManager.RoleExistsAsync(role))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole(role));
+                    }
+                }
+
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+                // Create one admin user, one moderator user and one normal user
+                var users = new[]
+                {
+                    new { UserName = "admin@example.com", Email = "admin@example.com", Password = "Admin@123", Role = "Admin" },
+                    new { UserName = "moderator@example.com", Email = "moderator@example.com", Password = "Moderator@123", Role = "Moderator" },
+                    new { UserName = "user@example.com", Email = "user@example.com", Password = "User@123", Role = "" }
+                };
+
+                foreach (var userInfo in users)
+                {
+                    var user = await userManager.FindByEmailAsync(userInfo.Email);
+                    if (user == null)
+                    {
+                        user = new User
+                        {
+                            UserName = userInfo.UserName,
+                            Email = userInfo.Email,
+                            EmailConfirmed = true
+                        };
+
+                        var result = await userManager.CreateAsync(user, userInfo.Password);
+                        if (result.Succeeded)
+                        {
+                            if (userInfo.Role != "")
+                                await userManager.AddToRoleAsync(user, userInfo.Role);
+                        }
+                    }
+                }
+
+            }
 
             app.Run();
         }

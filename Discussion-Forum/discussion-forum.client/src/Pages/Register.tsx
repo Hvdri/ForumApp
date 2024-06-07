@@ -1,124 +1,81 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// Register.tsx
+import React, { useState } from 'react';
+import axios from '../api/axiosConfig';
+import { useNavigate } from 'react-router-dom';
+import '../css/Auth.css';
 
-
-function Register() {
-    // state variables for email and passwords
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+const Register = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    // state variable for error messages
-    const [error, setError] = useState("");
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+        if (password.length < 8) {
+            setError('Password must be at least 8 characters long');
+            return;
+        }
+        if (!/\d/.test(password)) {
+            setError('Password must contain at least one digit');
+            return;
+        }
+        if (!/[A-Z]/.test(password)) {
+            setError('Password must contain at least one uppercase letter');
+            return;
+        }
+        if (!/\W/.test(password)) {
+            setError('Password must contain at least one non-alphanumeric character');
+            return;
+        }
 
-    const handleLoginClick = () => {
-        navigate("/login");
-    }
-
-
-    // handle change events for input fields
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (name === "email") setEmail(value);
-        if (name === "password") setPassword(value);
-        if (name === "confirmPassword") setConfirmPassword(value);
-    };
-
-    // handle submit event for the form
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // validate email and passwords
-        if (!email || !password || !confirmPassword) {
-            setError("Please fill in all fields.");
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            setError("Please enter a valid email address.");
-        } else if (password !== confirmPassword) {
-            setError("Passwords do not match.");
-        } else {
-            // clear error message
-            setError("");
-            // post data to the /register api
-            fetch("/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                }),
-            })
-                //.then((response) => response.json())
-                .then((data) => {
-                    // handle success or error from the server
-                    console.log(data);
-                    if (data.ok)
-                        setError("Successful register.");
-                    else
-                        setError("Error registering.");
-
-                })
-                .catch((error) => {
-                    // handle network error
-                    console.error(error);
-                    setError("Error registering.");
-                });
+        try {
+            const response = await axios.post('register', { email, password });
+            localStorage.setItem('token', response.data.accessToken);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
+            navigate('/login');
+        } catch (err) {
+            setError('Registration failed');
         }
     };
 
     return (
-        <div className="container">
-        <div className="box">
-            <h3>Register</h3>
-
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="email">Email:</label>
-                </div><div>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={email}
-                        onChange={handleChange}
-                    />
+        <div className='container'>
+            <div className='auth-container'>
+                <div className='title-container'>
+                    <h2>Register</h2>
                 </div>
-                <div>
-                    <label htmlFor="password">Password:</label></div><div>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={password}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="confirmPassword">Confirm Password:</label></div><div>
-                    <input
-                        type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        value={confirmPassword}
-                        onChange={handleChange}
-                    />
-                    </div>
-                    <div className="button-group-container">
-                        <div className="button-container">
-                    <button type="submit">Register</button>
-
-                </div>
-                        <div className="button-container">
-                    <button onClick={handleLoginClick}>Go to Login</button>
+                <div className='form-container'>
+                    <form onSubmit={handleSubmit}>
+                        <div className='fields-form'>
+                            <label>Email</label>
+                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                         </div>
-                    </div>
-            </form>
-
-            {error && <p className="error">{error}</p>}
+                        <div className='fields-form'>
+                            <label>Password</label>
+                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        </div>
+                        <div className='fields-form'>
+                            <label>Confirm Password</label>
+                            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                        </div>
+                        <div className='fields-form'>
+                            {error && <p style={{ color: 'red' }}>{error}</p>}
+                            <button type="submit">Register</button>
+                        </div>
+                    </form>
+                </div>
+                <div className='footer-container'>
+                    <p>Already have an account? <a href="/login">Login</a></p>
+                </div>
             </div>
-        </div>  
+        </div>
     );
-}
+};
 
 export default Register;

@@ -31,7 +31,7 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
 }
 
 const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
-    env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:7099';
+    env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'http://localhost:8080';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -46,23 +46,7 @@ export default defineConfig({
             '^/weatherforecast': {
                 target,
                 secure: false
-            },
-            '^/pingauth': {
-                target: 'https://localhost:7249/',
-                secure: false
-            },
-            '^/register': {
-                target: 'https://localhost:7249/',
-                secure: false
-            },
-            '^/login': {
-                target: 'https://localhost:7249/',
-                secure: false
-            },
-            '^/logout': {
-                target: 'https://localhost:7249/',
-                secure: false
-            } 
+            }
         },
         port: 5173,
         https: {

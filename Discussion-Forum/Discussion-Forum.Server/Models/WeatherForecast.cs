@@ -1,4 +1,4 @@
-namespace Discussion_Forum.Server
+namespace Discussion_Forum.Server.Models
 {
     public class WeatherForecast
     {

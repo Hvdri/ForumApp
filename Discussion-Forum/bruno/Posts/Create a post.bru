@@ -1,0 +1,19 @@
+meta {
+  name: Create a post
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/post
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Test post",
+    "content": "This is a test post",
+    "topicId": "e850958f-82e4-4918-9e9a-b4a2f305aab8"
+  }
+}
