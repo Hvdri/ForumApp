@@ -3,26 +3,16 @@ import { useParams } from 'react-router-dom';
 import { User } from '../App';
 import '../css/Profile.css';
 import axios from '../api/axiosConfig';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 const Profile: React.FC = () => {
     const { userId } = useParams<{ userId: string }>();
     const [user, setUser] = useState<User | null>(null);
-    const [roles, setRoles] = useState<string[]>([]);
-    const [newRole, setNewRole] = useState<string>('');
-    const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [availableRoles, setAvailableRoles] = useState<string[]>([]);
-
-    useEffect(() => {
-        if (userId) {
-            fetchUser();
-            fetchRoles();
-
-            if (user) {
-            setIsAdmin(user.roles.includes('Admin'));
-            setAvailableRoles(roles.filter((role) => !user.roles.includes(role)));
-            }
-        }
-    }, [userId, newRole]);
+    const [selectedRole, setSelectedRole] = useState<string>('');
+    const [loading, setLoading] = useState(true);
 
     const fetchUser = async () => {
         try {
@@ -30,100 +20,123 @@ const Profile: React.FC = () => {
             setUser(response.data);
         } catch (error) {
             console.error('Error fetching user:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const fetchRoles = async () => {
+    const fetchCurrentUser = async () => {
+        try {
+            const response = await axios.get('user/current');
+            setCurrentUser(response.data);
+        } catch (error) {
+            console.error('Error fetching current user:', error);
+        }
+    };
+
+    const fetchAvailableRoles = async () => {
         try {
             const response = await axios.get('/roles');
             const rolesString = response.data.map((role: any) => role.name);
-            setRoles(rolesString);
+            setAvailableRoles(rolesString);
         } catch (error) {
             console.error('Error fetching roles:', error);
         }
     };
 
-    const addRole = async (role: string) => {
-        try {
-            const response = await axios.post(`/user/${userId}/role`,
-                JSON.stringify(role),
-                { headers: { 'Content-Type': 'application/json-patch+json' } }
-            );
-            setUser(response.data);
-        } catch (error) {
-            console.error('Error adding role:', error);
-        }
-    };
+    useEffect(() => {
 
-    const removeRole = async (role: string) => {
+        if (userId) {
+            fetchUser();
+            fetchCurrentUser();
+            fetchAvailableRoles();
+        }
+    }, [userId]);
+
+    const handleRemoveRole = async (role: string) => {
+        if (!user) return;
+
         try {
             const response = await axios.delete(`/user/${userId}/role`, {
                 headers: { 'Content-Type': 'application/json-patch+json' },
                 data: JSON.stringify(role),
             });
             setUser(response.data);
+            fetchUser();
         } catch (error) {
             console.error('Error deleting role:', error);
         }
     };
+
+    const handleAddRole = async (role: string) => {
+        if (!user || !selectedRole) return;
+
+        try {
+            const response = await axios.post(`/user/${userId}/role`,
+                JSON.stringify(role),
+                { headers: { 'Content-Type': 'application/json-patch+json' } }
+            );
+            setUser(response.data);
+            fetchUser();
+        } catch (error) {
+            console.error('Error adding role:', error);
+        }
+    };
+
+
+    if (loading) {
+        return (
+            <div className="main-container">
+                <p>Loading...</p>
+            </div>
+        );
+    }
 
     if (!user) {
         return (
             <div className="main-container">
                 <h1>User Profile</h1>
                 <p>You need to be logged in to view this page.</p>
+                <a href='/login'>Login</a>
             </div>
         );
     }
 
+    const isAdmin = currentUser?.roles.includes('User');
+
     return (
+
         <div className="main-container">
             <h2>User Profile</h2>
             <div className="profile-details">
-                <p>Username: {user.name}</p>
-                <div>
-                    <p>Roles:</p>
-                    <div>
-                        {(user.roles && user.roles.length > 0) ? user.roles.map((role, index) => (
-                            <div key={index}>
-                                <span>{role}</span>
-                                {isAdmin && (
-                                    <button
-                                        className="btn btn-danger"
-                                        onClick={() => removeRole(role)}
-                                    >
-                                        Remove
-                                    </button>
-                                )}
-                            </div>
-                        )) : 'User has no roles'}
-                    </div>
-                    {isAdmin && (
-                        <div>
-                            <select
-                                value={newRole}
-                                onChange={(e) => setNewRole(e.target.value)}
-                            >
-                                <option value="" disabled>Select a role to add</option>
-                                {availableRoles.map((role, index) => (
-                                    <option key={index} value={role}>{role}</option>
-                                ))}
-                            </select>
-                            <button
-                                className="btn btn-primary"
-                                onClick={() => {
-                                    if (newRole) {
-                                        addRole(newRole);
-                                        setNewRole('');
-                                    }
-                                }}
-                            >
-                                Add Role
-                            </button>
-                        </div>
-                    )}
+                <div className='profile-user'>
+                    <FontAwesomeIcon icon={faUser} className="profile-icon" />
+                    <p className='profile-username'>{user.name}</p>
+                </div>
+                <p className='role-title'>Roles:</p>
+                <div className='role-list'>
+                    {user.roles.map(role => (
+                        <li key={role}>
+                            {role} {isAdmin && <button className='role-button' onClick={() => handleRemoveRole(role)}>Remove</button>}
+                        </li>
+                    ))}
                 </div>
             </div>
+
+            {isAdmin && (
+                <div className="role-management">
+                    <h3>Manage Roles</h3>
+                    <div className='role-select-container'>
+                        <select className='role-select' value={selectedRole} onChange={e => setSelectedRole(e.target.value)}>
+                            <option className='role-option' value="">Select a role</option>
+                            {availableRoles.map(role => (
+                                <option className='role-option' key={role} value={role}>{role}</option>
+                            ))}
+                        </select>
+                        <button className='role-button' onClick={() => handleAddRole(selectedRole)}>Add Role</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

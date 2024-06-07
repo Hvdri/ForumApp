@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axiosConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,6 +16,7 @@ interface PostsProps {
 const Posts: React.FC<PostsProps> = ({ user }) => {
     const { topicId } = useParams<{ topicId: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
     const [posts, setPosts] = useState([]);
     const [topic, setTopic] = useState<any>(null);
     const [editingTopic, setEditingTopic] = useState(false);
@@ -24,20 +25,16 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
     const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    // const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        console.log("topic" + topicId)
-        if (topicId) {
+        if (location.state && location.state.topic) {
+            setTopic(location.state.topic);
+        } else if (topicId) {
             fetchTopic(topicId);
-            fetchPosts(topicId);
         }
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+        fetchPosts(topicId);
+    }, [topicId, location.state]);
 
     const fetchTopic = async (topicId: string) => {
         try {
@@ -66,11 +63,11 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
         setVisibleDropdown((prev) => (prev === postId ? null : postId));
     };
 
-    const handleClickOutside = (event: MouseEvent) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-            setVisibleDropdown(null);
-        }
-    };
+    // const handleClickOutside = (event: MouseEvent) => {
+    //     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    //         setVisibleDropdown(null);
+    //     }
+    // };
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -148,11 +145,10 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
 
     return (
         <div className='main-container'>
-            
+
             <div className='topic-banner'>
                 <div className='banner-item'>
                     <div className='banner-title-icon'>
-                        <FontAwesomeIcon className='banner-icon' icon={faMessage} />
                         {topic && (
                             editingTopic ? (
                                 <div className='edit-topic'>
@@ -171,29 +167,37 @@ const Posts: React.FC<PostsProps> = ({ user }) => {
                                     </div>
                                 </div>
                             ) : (
-                                <h2 className='banner-name'>{topic.name}</h2>
+                                <div className='banner-subcontainer1'>
+                                    <div className='banner-icon-container'>
+                                        <FontAwesomeIcon className='banner-icon' icon={faMessage} />
+                                        <h2 className='banner-name'>{topic.name}</h2>
+                                        <div className='post-button'>
+                                            <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(topic.id); }}>
+                                                <FontAwesomeIcon icon={faEllipsis} />
+                                            </button>
+                                            {topic && (visibleDropdown === topic.id) && (
+                                                <div className='dropdown-menu'>
+                                                    {canEditOrDelete() && <div className='dropdown-item' onClick={handleEditTopic}>Edit</div>}
+                                                    {canEditOrDelete() && <div className='dropdown-item' onClick={handleDeleteTopic}>Delete</div>}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className='banner-subcontainer2'>
+                                        <div className='banner-description'>
+                                            {topic && <p>{topic.description}</p>}
+                                        </div>
+                                        <div className='banner-button-container'>
+                                            <button className='banner-group-item' onClick={() => navigate(`/topic/${topicId}/create-post`)}>
+                                                <FontAwesomeIcon className='banner-icon' icon={faPlus} />Create a post
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                </div>
                             )
                         )}
                     </div>
-                    <div className='banner-button-container'>
-                        <button className='banner-group-item' onClick={() => navigate(`/topic/${topicId}/create-post`)}>
-                            <FontAwesomeIcon className='banner-icon' icon={faPlus} />Create a post
-                        </button>
-                        <div className='post-button'>
-                            <button onClick={(e) => { e.stopPropagation(); handleEllipsisClick(topic.id); }}>
-                                <FontAwesomeIcon icon={faEllipsis} />
-                            </button>
-                            {topic && (visibleDropdown === topic.id) && (
-                                <div className='dropdown-menu'>
-                                    {canEditOrDelete() && <div className='dropdown-item' onClick={handleEditTopic}>Edit</div>}
-                                    {canEditOrDelete() && <div className='dropdown-item' onClick={handleDeleteTopic}>Delete</div>}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-                <div className='banner-description'>
-                    {topic && <p>{topic.description}</p>}
                 </div>
             </div>
 

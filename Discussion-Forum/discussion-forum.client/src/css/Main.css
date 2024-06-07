@@ -35,6 +35,7 @@
     flex-direction: column;
     align-items: start;
     justify-content: left;
+    padding-right: 8rem;
 }
 
 .banner-group-item {
@@ -241,6 +242,25 @@ textarea::placeholder {
     color: #fff;
     border: none;
     font-size: 14px;
+}
+
+.banner-icon-container {
+    display: flex;
+    align-items: center;
+}
+
+.banner-subcontainer2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+
+}
+
+.banner-button-container {
+    position: absolute;
+    right: 4rem;
+    top: 1rem;
 }
 
 @media screen and (min-width: 768px) {
