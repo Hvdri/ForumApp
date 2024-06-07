@@ -65,8 +65,6 @@ namespace Discussion_Forum.Server
                 app.UseSwaggerUI();
             }
 
-
-
             app.MapIdentityApi<User>();
 
             app.UseAuthentication();
@@ -113,7 +111,7 @@ namespace Discussion_Forum.Server
                         var result = await userManager.CreateAsync(user, userInfo.Password);
                         if (result.Succeeded)
                         {
-                            if (userInfo.Role is not null)
+                            if (userInfo.Role != "")
                                 await userManager.AddToRoleAsync(user, userInfo.Role);
                         }
                     }
