@@ -148,7 +148,6 @@ const Posts: React.FC<PostsProps> = ({ user, updateTopics  }) => {
 
     return (
         <div className='main-container'>
-
             <div className='topic-banner'>
                 <div className='banner-item'>
                     <div className='banner-title-icon'>

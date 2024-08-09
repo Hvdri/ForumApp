@@ -12,6 +12,16 @@
     border-bottom: 1px solid #333;
 }
 
+.navbar-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+}
+
+.navbar-logo:hover {
+  cursor: pointer;
+}
+
 .navbar-logo .icon {
     height: 25px;
     cursor: pointer;

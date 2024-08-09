@@ -81,6 +81,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, setUser }) => {
     <div className="navbar">
       <div className="navbar-logo" onClick={handleLogoClick}>
         <FontAwesomeIcon icon={faFaceKissBeam} className="icon" />
+        <p>Homepage</p>
       </div>
       <div className="navbar-user" onClick={handleUserClick} ref={dropdownRef}>
         <FontAwesomeIcon icon={faUser} className="icon" />
