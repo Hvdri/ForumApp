@@ -1,3 +1,4 @@
+using Discussion_Forum.Server.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

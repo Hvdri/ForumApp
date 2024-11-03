@@ -1,0 +1,46 @@
+meta {
+  name: Update Post
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/post/3C35FD4A-CD4C-488F-8281-85DE14FB05D1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "Id": "3C35FD4A-CD4C-488F-8281-85DE14FB05D1",
+    "Title": "[TALK] Animation Movies",
+    "Content": "According to the definitions by AFI, AMPAS, and BFI, an animation is considered a feature film if its running time is at least 40 minutes. This means many view Snow White and the Seven Dwarfs as the first true animated feature film, despite seven prior films, of which only four have survived. Produced by Walt Disney and released in 1937, it marked the beginning of an era where animated films captivated global audiences, earned significant box office revenues, and received critical acclaim. Another early example is Fantasia, also by Disney, released in 1940. The 1960s saw the rise of more animation studios alongside Disney, such as Hanna-Barbera, and later Pixar and DreamWorks in subsequent decades. A pivotal moment for animation was The Lion King in 1994, a hand-drawn film that became the highest-grossing film of the year, outperforming even Forrest Gump. This demonstrated that animated movies could compete with major international blockbusters. Following this, films like Toy Story 2, Monsters, Inc., and Shrek not only garnered awards but also dominated the box office. Today, Frozen holds the record for the highest-grossing animated film with over $1.27 billion, while adjusted for inflation, Snow White and the Seven Dwarfs remains the top with earnings exceeding $1.74 billion.",
+    "AuthorId": "23134ea5-4bbf-4e9d-9179-4931e2db9f75",
+    "author": {
+        "createdAt": "2024-06-03T13:41:30.2434861",
+        "lastUpdatedAt": "2024-06-03T13:41:30.2434862",
+        "lastLogin": "0001-01-01T00:00:00",
+        "id": "23134ea5-4bbf-4e9d-9179-4931e2db9f75",
+        "userName": "admin@example.com",
+        "normalizedUserName": "ADMIN@EXAMPLE.COM",
+        "email": "admin@example.com",
+        "normalizedEmail": "ADMIN@EXAMPLE.COM",
+        "emailConfirmed": true,
+        "passwordHash": "AQAAAAIAAYagAAAAEGEyO6T3N+asTVWSTnUFRcNx9DP7JUUgczkzn05MPHn60NcgrlpM1qqtmJmE3Uc7GQ==",
+        "securityStamp": "IDE3NB5SAHUKCJVCHZLGAZBVTOZDMIZF",
+        "concurrencyStamp": "15b5c4f6-eb46-43a7-9e99-dee2e88ecb3d",
+        "phoneNumber": null,
+        "phoneNumberConfirmed": false,
+        "twoFactorEnabled": false,
+        "lockoutEnd": null,
+        "lockoutEnabled": true,
+        "accessFailedCount": 0
+      },
+    "TopicId": "63097BD0-356F-4601-8F48-2956B38D26D6",
+     "topic": {
+        "id": "63097bd0-356f-4601-8f48-2956b38d26d6",
+        "name": "Movies",
+        "description": "Welcome to Movie Discussion! I hope you enjoy your time here. Please be respectful to each other, and in case you post spoilers, put #spoiler at the start of the comment. Stay on topic, don't spam and  use appropriate language"
+      }
+  }
+}

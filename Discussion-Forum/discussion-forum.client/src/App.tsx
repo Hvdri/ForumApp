@@ -1,56 +1,74 @@
-import { useEffect, useState } from 'react';
 import './App.css';
+import './index.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Posts from './pages/Posts';
+import CreateTopic from './pages/CreateTopic';
+import CreatePost from './pages/CreatePost';
+import PostDetail from './pages/PostDetail';
+import { useEffect, useState } from 'react';
+import axios from './api/axiosConfig';
+import Navbar from './components/Navbar';
+import PrivateRoute from './components/PrivateRoute';
+import Profile from './pages/Profile';
 
-interface Forecast {
-    date: string;
-    temperatureC: number;
-    temperatureF: number;
-    summary: string;
+import AuthLayout from './layout/AuthLayout';
+import MainLayout from './layout/MainLayout';
+
+export interface User {
+    id: string;
+    name: string;
+    roles: string[];
 }
 
 function App() {
-    const [forecasts, setForecasts] = useState<Forecast[]>();
+    
+    const [topics, setTopics] = useState([]);
+    const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
-        populateWeatherData();
+        fetchTopics();
+        fetchUser();
     }, []);
 
-    const contents = forecasts === undefined
-        ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
-        : <table className="table table-striped" aria-labelledby="tabelLabel">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                {forecasts.map(forecast =>
-                    <tr key={forecast.date}>
-                        <td>{forecast.date}</td>
-                        <td>{forecast.temperatureC}</td>
-                        <td>{forecast.temperatureF}</td>
-                        <td>{forecast.summary}</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>;
+    const fetchTopics = async () => {
+        try {
+            const response = await axios.get('/topic');
+            setTopics(response.data);
+        } catch (error) {
+            console.error('Error fetching topics', error);
+        }
+    };
 
+    const fetchUser = async () => {
+        try {
+            const response = await axios.get('/user/current');
+            setUser(response.data);
+        } catch (error) {
+            console.error('Error fetching user', error);
+        }
+    };
+    const updateTopics = async () => {
+        await fetchTopics();
+    };
     return (
-        <div>
-            <h1 id="tabelLabel">Weather forecast</h1>
-            <p>This component demonstrates fetching data from the server.</p>
-            {contents}
-        </div>
-    );
+        <BrowserRouter>
+            <Navbar user={user} setUser={setUser} />
+            <Routes>
 
-    async function populateWeatherData() {
-        const response = await fetch('weatherforecast');
-        const data = await response.json();
-        setForecasts(data);
-    }
+                <Route path="/login" element={<AuthLayout><Login setUser={setUser}/></AuthLayout>} />
+                <Route path="/register" element={<AuthLayout><Register /></AuthLayout>} />
+                <Route path="/" element={<MainLayout topics={topics}><Home /></MainLayout>} />
+                <Route path="/create-topic" element={<MainLayout topics={topics}><PrivateRoute element={() => <CreateTopic updateTopics={updateTopics} />} /></MainLayout>} />
+                <Route path="/topic/:topicId/create-post" element={<MainLayout topics={topics}><PrivateRoute element={CreatePost} /></MainLayout>} />
+                <Route path="/post/:postId" element={<MainLayout topics={topics}><PostDetail user={user} /></MainLayout>} />
+                <Route path="/topic/:topicId" element={<MainLayout topics={topics}><Posts user={user} updateTopics={updateTopics} /></MainLayout>} />
+                <Route path="/profile/:userId" element={<MainLayout topics={topics}><Profile /></MainLayout>} />
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default App;

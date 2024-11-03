@@ -4,6 +4,7 @@ using Discussion_Forum.Server.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,16 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Discussion_Forum.Server.Migrations
 {
     [DbContext(typeof(ForumDbContext))]
-    partial class ForumDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240531120355_Added-Forum-Tables")]
+    partial class AddedForumTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.6")
-                .HasAnnotation("Proxies:ChangeTracking", false)
-                .HasAnnotation("Proxies:CheckEquality", false)
-                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -32,7 +32,6 @@ namespace Discussion_Forum.Server.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AuthorId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
@@ -48,11 +47,16 @@ namespace Discussion_Forum.Server.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("PostId");
+
+                    b.HasIndex("UpdatedById");
 
                     b.ToTable("Comments");
                 });
@@ -64,7 +68,6 @@ namespace Discussion_Forum.Server.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AuthorId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
@@ -78,17 +81,17 @@ namespace Discussion_Forum.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("TopicId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
 
-                    b.HasIndex("TopicId");
+                    b.HasIndex("UpdatedById");
 
                     b.ToTable("Posts");
                 });
@@ -322,39 +325,39 @@ namespace Discussion_Forum.Server.Migrations
             modelBuilder.Entity("Discussion_Forum.Server.Models.Entities.Comment", b =>
                 {
                     b.HasOne("Discussion_Forum.Server.Models.Entities.User", "Author")
-                        .WithMany("Comments")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("AuthorId");
 
                     b.HasOne("Discussion_Forum.Server.Models.Entities.Post", "Post")
-                        .WithMany("Comments")
+                        .WithMany()
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Discussion_Forum.Server.Models.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
                     b.Navigation("Author");
 
                     b.Navigation("Post");
+
+                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Discussion_Forum.Server.Models.Entities.Post", b =>
                 {
                     b.HasOne("Discussion_Forum.Server.Models.Entities.User", "Author")
-                        .WithMany("Posts")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("AuthorId");
 
-                    b.HasOne("Discussion_Forum.Server.Models.Entities.Topic", "Topic")
-                        .WithMany("Posts")
-                        .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                    b.HasOne("Discussion_Forum.Server.Models.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
 
                     b.Navigation("Author");
 
-                    b.Navigation("Topic");
+                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -406,23 +409,6 @@ namespace Discussion_Forum.Server.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Discussion_Forum.Server.Models.Entities.Post", b =>
-                {
-                    b.Navigation("Comments");
-                });
-
-            modelBuilder.Entity("Discussion_Forum.Server.Models.Entities.Topic", b =>
-                {
-                    b.Navigation("Posts");
-                });
-
-            modelBuilder.Entity("Discussion_Forum.Server.Models.Entities.User", b =>
-                {
-                    b.Navigation("Comments");
-
-                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,18 @@
+meta {
+  name: Modify user data
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/user/62d5ea84-de31-47ed-b685-04a4ab973d2a
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "Id": "62d5ea84-de31-47ed-b685-04a4ab973d2a",
+    "UserName": "Yoyo"
+  }
+}
