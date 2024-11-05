@@ -1,18 +1,18 @@
 import './App.css';
 import './index.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Posts from './pages/Posts';
-import CreateTopic from './pages/CreateTopic';
-import CreatePost from './pages/CreatePost';
-import PostDetail from './pages/PostDetail';
+import Home from './Pages/Home';
+import Login from './Pages/Login';
+import Register from './Pages/Register';
+import Posts from './Pages/Posts';
+import CreateTopic from './Pages/CreateTopic';
+import CreatePost from './Pages/CreatePost';
+import PostDetail from './Pages/PostDetail';
 import { useEffect, useState } from 'react';
 import axios from './api/axiosConfig';
 import Navbar from './components/Navbar';
 import PrivateRoute from './components/PrivateRoute';
-import Profile from './pages/Profile';
+import Profile from './Pages/Profile';
 
 import AuthLayout from './layout/AuthLayout';
 import MainLayout from './layout/MainLayout';
